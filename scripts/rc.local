@@ -1,0 +1,87 @@
+#!/bin/sh
+
+
+#set up the home dir
+if [ ! -z ${home} ]; then
+	echo "INFO: mounting home dir"
+    mount -t hostfs ${home} /root -o ${home};
+fi;
+
+
+# set up networking...
+
+#TODO dynamic interface count
+for i in `seq 0 3`; do
+	#get current interface and associated env info
+	CONF_VAR="ip$i"
+	ETH="eth$i"
+	eval ETH_VAL=\$$CONF_VAR
+	if [ ! -z $ETH_VAL ]; then
+		#extract the IP
+		IP=${ETH_VAL%%/*}
+		#calculate netmask
+		NETMASK=`ipcalc -m $ETH_VAL |cut -f2 -d"="`
+		#calculate broadcast address
+		BCAST=`ipcalc -b $ETH_VAL|cut -f2 -d"="`
+		#configure interface
+		echo "INFO: configuring interface $ETH with IP:$IP NETMASK:$NETMASK BCAST:$BCAST"
+		ifconfig $ETH $IP netmask $NETMASK broadcast $BCAST
+	fi
+done
+
+
+case ${role} in
+
+	router)
+       echo 1 > /proc/sys/net/ipv4/ip_forward
+
+        if [ ! -z ${gw} ]; then
+                #set default gateway
+                echo "INFO: Settting default gateway to $gw"
+                ip route add default via $gw
+        fi
+
+        if [ ! -z ${quaggadir} ]; then
+                quaggadir=/root/uml/configs/${quaggadir}
+                mount -t hostfs none /etc/quagga -o $quaggadir
+                chown -R quagga:quagga /etc/quagga
+        fi
+
+        /etc/init.d/quagga start
+	;;
+        bridge)
+                #load bridge module
+                modprobe bridge
+                for i in `seq 0 3`; do
+                        BRIDGE="bridge$i"
+                        eval BRVAL=\$$BRIDGE
+                        if [ ! -z "$BRVAL" ]; then
+                                brctl addbr "$BRIDGE"
+                                brctl stp "$BRIDGE" on
+                                echo "INFO: bridge $BRIDGE is up"
+                                for iface in $BRVAL; do
+					hostid=${hostid}
+                                        j=`echo $iface | sed  -e 's/[^0-9]//g'`
+                                        MACIF="00:BB:00:BB:$hostid$hostid:0$j"
+                                        MACBR="00:BB:BB:BB:BB:$hostid$j"
+					ifconfig $iface down
+                                        ifconfig $iface hw ether $MACIF
+                                        brctl addif $BRIDGE $iface
+					ifconfig $iface up
+                                        echo "INFO: added $iface to bridge $BRIDGE"
+                                done
+
+                               ifconfig $BRIDGE up hw ether $MACBR
+
+                        fi
+                done
+                echo "INFO: bridges are up"
+        ;;
+
+
+	sniffer)
+		ip link set eth0 up
+		tcpdump -i eth0 -U -s 0 -w /root/${name}-`date +%H%M`.dmp ${tcpdump}&
+		echo "INFO: sniffer role activated"
+	;;
+esac

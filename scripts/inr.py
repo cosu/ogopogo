@@ -1,7 +1,5 @@
 __author__ = 'cdumitru'
 
-__author__ = 'cdumitru'
-
 import sys, ConfigParser, time, os
 
 
@@ -10,7 +8,7 @@ def stop_host( host_id, config):
 
 
 def stop_switch(switch_id, config):
-    return "start-stop-daemon --stop --pidfile " + config.get("global", "switch_path") + "/"\
+    return "start-stop-daemon --stop --pidfile " + config.get("global", "switch_path") + "/switch"\
            + str(switch_id) + ".pid "
 
 
