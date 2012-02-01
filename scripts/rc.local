@@ -4,10 +4,7 @@
 MAX_ETH=9 
 
 
-#activate ipv6 support
 
-
-modprobe ipv6
 
 #bring local host up
 ifconfig lo up
@@ -91,11 +88,18 @@ case ${role} in
 
 	sniffer)
 		for i in `seq 0 $MAX_ETH`; do
-			ETH="eth$i"
-			ip link set $ETH up
-			tcpdump -i $ETH -U -s 0 -w /root/${name}-$ETH-`date +%H%M`.dmp ${tcpdump}&
+		    if [ i -lt ${interface_count}; ] then
+			    ETH="eth$i"
+
+			    ip link set $ETH up
+			    tcpdump -i $ETH -U -s 0 -w /root/${name}-$ETH-`date +%H%M`.dmp ${tcpdump}&
+			fi
 		done
 
 		echo "INFO: sniffer role activated"
 	;;
 esac
+
+
+#activate ipv6 support
+modprobe ipv6
