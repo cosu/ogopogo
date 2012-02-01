@@ -1,6 +1,12 @@
 #!/bin/sh
 
+#maximum number of network interfaces
+MAX_ETH=9 
+
+
 #activate ipv6 support
+
+
 modprobe ipv6
 
 #bring local host up
@@ -17,7 +23,7 @@ fi;
 # set up networking...
 
 #TODO dynamic interface count
-for i in `seq 0 3`; do
+for i in `seq 0 $MAX_ETH`; do
 	#get current interface and associated env info
 	CONF_VAR="ip$i"
 	ETH="eth$i"
@@ -25,7 +31,11 @@ for i in `seq 0 3`; do
 	eval IP_VAL=\$$CONF_VAR
 	if [ ! -z $IP_VAL ]; then
 		#configure interface
-		echo "INFO: configuring interface $ETH with IP:$IP_VAL"
+        MACIF="00:AA:AA:AA:${index}:0$i"
+		#set mac address
+		ifconfig $ETH down
+        ifconfig $ETH hw ether $MACIF
+		echo "INFO: configuring interface $ETH with IP:$IP_VAL MAC: $MACIF"
 		ifconfig $ETH $IP_VAL up
 	fi
 done
@@ -54,8 +64,8 @@ case ${role} in
         bridge)
                 #load bridge module
                 modprobe bridge
-				#TODO more than 4 bridges
-                for i in `seq 0 3`; do
+
+                for i in `seq 0 $MAX_ETH`; do
                         BRIDGE="bridge$i"
                         eval BRVAL=\$$BRIDGE
 						#configure bridge
@@ -63,18 +73,14 @@ case ${role} in
                                 brctl addbr "$BRIDGE"
                                 brctl stp "$BRIDGE" on
                                 echo "INFO: bridge $BRIDGE is up"
-                                for iface in $BRVAL; do
-										bridgeid=${bridgeid}
-                                        j=`echo $iface | sed  -e 's/[^0-9]//g'`
-                                        MACIF="00:BB:00:BB:$bridgeid$bridgeid:0$j"
-										ifconfig $iface down
-                                        ifconfig $iface hw ether $MACIF
-                                        brctl addif $BRIDGE $iface
-										ifconfig $iface up
-                                        echo "INFO: added $iface to bridge $BRIDGE"
+                                for ETH in $BRVAL; do
+									ifconfig  $ETH down
+									brctl addif $BRIDGE $ETH
+									ifconfig $ETH up
+									echo "INFO: added $ETH to bridge $BRIDGE"
                                 done
-								
-                               MACBR="00:BB:BB:BB:BB:$hostid$j"
+							   
+                               MACBR="00:BB:BB:BB:${index}:${index}"
                                ifconfig $BRIDGE up hw ether $MACBR
                                echo "INFO: added bridge $BRIDGE with MAC: $MACBR"
                         fi
@@ -84,8 +90,12 @@ case ${role} in
 
 
 	sniffer)
-		ip link set eth0 up
-		tcpdump -i eth0 -U -s 0 -w /root/${name}-`date +%H%M`.dmp ${tcpdump}&
+		for i in `seq 0 $MAX_ETH`; do
+			ETH="eth$i"
+			ip link set $ETH up
+			tcpdump -i $ETH -U -s 0 -w /root/${name}-$ETH-`date +%H%M`.dmp ${tcpdump}&
+		done
+
 		echo "INFO: sniffer role activated"
 	;;
 esac

@@ -42,8 +42,15 @@ def start_host(uml_id, config, index=0):
     the start host command as a string
     """
     cmd = "screen -dmS " + uml_id
+    #normalize index
+    # the index must be 2 digits
+    idx = str(hex(index))[2:]
+    if len(idx) < 2:
+        idx = "0" +idx
+
     cmd = cmd + " linux.uml umid=" + uml_id + " rootfstype=hostfs "\
-                                              "rootflags=" + config.get(uml_id, "rootfs_path") + " name=" + uml_id
+                                              "rootflags=" + config.get(uml_id, "rootfs_path") + " name=" + uml_id + \
+                                            " role=" + config.get(uml_id,"role") + " index=" + idx
 
     #count interfaces
     interface_count = 0
