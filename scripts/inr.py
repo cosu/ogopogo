@@ -4,9 +4,10 @@ __author__ = 'cdumitru'
 
 import sys, ConfigParser, time, os, logging
 
-debug=True
+debug=False
 
 def execute(cmd):
+    global debug
     logging.info(cmd)
     if not debug: os.system(cmd)
 
@@ -15,7 +16,7 @@ def stop_host( uml_id, config):
     cow_path = config.get("global", "cow_path")
     root_image = config.get("global", "root_image")
     cow_file = cow_path +"/"+ root_image.split("/")[-1] +"-"+uml_id+".cow"
-    execute(" rm -f " + cow_file)
+    execute("rm -f " + cow_file)
     execute("uml_mconsole " + uml_id + " halt")
 
 
@@ -139,6 +140,7 @@ def start(config):
                 devices[role].append(device)
 
     #allow sniffers to start
+    global debug
     if not debug: time.sleep(5)
     else: logging.info("#sleep 5")
 
@@ -178,6 +180,8 @@ def debug(config):
     Returns:
     nothing
     """
+    global debug
+    debug = True
     start(config)
     stop(config)
 
