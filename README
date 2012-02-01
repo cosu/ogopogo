@@ -2,11 +2,12 @@ SNE INR 2012 Public repo
 
 ==Getting started
 
-- write a cfg file using .ini/properties format (see example/docs)
+- write a cfg file using .ini/properties format (see /examples)
 - start network ./inr.py start config.cfg
 - stop network ./inr.py stop config.cfg
 
 
 ==TODO
 - Implement network diagram
-- Add rc.init script
+- Fix MAC generation for bridge in rc.local
+- More examples
