@@ -88,7 +88,7 @@ case ${role} in
 
 	sniffer)
 		for i in `seq 0 $MAX_ETH`; do
-		    if [ i -lt ${interface_count} ]; then
+		    if [ $i -lt ${interface_count} ]; then
 			    ETH="eth$i"
 
 			    ip link set $ETH up
