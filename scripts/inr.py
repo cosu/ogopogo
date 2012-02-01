@@ -14,7 +14,7 @@ def execute(cmd):
 def stop_host( uml_id, config):
     cow_path = config.get("global", "cow_path")
     root_image = config.get("global", "root_image")
-    cow_file = cow_path +"/"+ root_image.split("/")[-1] +".cow"
+    cow_file = cow_path +"/"+ root_image.split("/")[-1] +"-"+uml_id+".cow"
     execute(" rm -f " + cow_file)
     execute("uml_mconsole " + uml_id + " halt")
 
@@ -56,15 +56,13 @@ def start_host(uml_id, config, index=0):
     cmd += " linux.uml umid=" + uml_id + " role=" + config.get(uml_id,"role") + " index=" + idx + " name=" + uml_id
 
 
-    if config.has_option("global", "root_image"):
-        cow_path = config.get("global", "cow_path")
-        root_image = config.get("global", "root_image")
-        cow_file = cow_path +"/"+ root_image.split("/")[-1] +".cow"
+    cow_path = config.get("global", "cow_path")
+    root_image = config.get("global", "root_image")
+    cow_file = cow_path +"/"+ root_image.split("/")[-1] +"-"+uml_id+".cow"
 
-        execute("uml_mkcow -f " + cow_file + " " + root_image)
-        cmd += " ubd0=" + cow_file + ","+root_image
-    else:
-        cmd +=" rootfstype=hostfs " + "rootflags=" + config.get(uml_id, "rootfs_path")
+    execute("uml_mkcow -f " + cow_file + " " + root_image)
+
+    cmd += " ubd0=" + cow_file + ","+root_image
 
 
     #count interfaces
