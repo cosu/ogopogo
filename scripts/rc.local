@@ -101,5 +101,16 @@ case ${role} in
 esac
 
 
+#execute optional script
+if [ ! -z ${script} ]; then
+	echo "INFO: executing /root/${script}"
+	bash /root/{$script}
+fi;
+
+#execute optional command
+if [ ! -z ${command} ]; then
+	eval ${command}
+fi;
+
 #activate ipv6 support
 modprobe ipv6
