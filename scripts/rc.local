@@ -22,19 +22,32 @@ fi;
 #TODO dynamic interface count
 for i in `seq 0 $MAX_ETH`; do
 	#get current interface and associated env info
-	CONF_VAR="ip$i"
+	IPV4_VAR="ip$i"
+	IPV6_VAR="ip6$i"
 	ETH="eth$i"
 	#build eth0, eth1, eth2 ...
-	eval IP_VAL=\$$CONF_VAR
-	if [ ! -z $IP_VAL ]; then
+	eval IPV4_VAL=\$$IPV4_VAR
+	eval IPV6_VAL=\$$IPV6_VAR
+	if [ ! -z $IPV4_VAL -o  ! -z $IPV6_VAL ]; then
 		#configure interface
         MACIF="00:AA:AA:AA:${index}:0$i"
 		#set mac address
 		ifconfig $ETH down
+		echo "INFO: configuring interface $ETH with IP:$IPV4_VAL $IPV6_VAL MAC: $MACIF"
         ifconfig $ETH hw ether $MACIF
-		echo "INFO: configuring interface $ETH with IP:$IP_VAL MAC: $MACIF"
-		ifconfig $ETH $IP_VAL up
+
+		if [ ! -z $IPV4_VAL ]; then
+		    ifconfig $ETH $IPV4_VAL
+		fi
+		if [ ! -z $IPV6_VAL ]; then
+		    ifconfig $ETH inet6 add $IPV6_VAL
+		fi
+
+		ifconfig $ETH up
 	fi
+
+
+
 done
 
 

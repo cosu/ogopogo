@@ -71,13 +71,16 @@ def start_host(uml_id, config, index=0):
 
     for interface in config.options(uml_id):
         if interface.startswith("eth"):
-            (to_switch, ip) = config.get(uml_id, interface).split(',')
+            (to_switch, ipv4,ipv6) = config.get(uml_id, interface).split(',')
             eth = " " + interface + "=daemon,,unix,"
             sw = config.get("global", "switch_path") + "/switch" + to_switch + ".ctl"
             cmd = cmd + eth + sw
 
-            if ip:
-                iface = " ip" + str(interface_count) + "=" + ip + " "
+            if ipv4:
+                iface = " ip" + str(interface_count) + "=" + ipv4 + " "
+                cmd += iface
+            if ipv6:
+                iface = " ip6" + str(interface_count) + "=" + ipv6 + " "
                 cmd += iface
             interface_count+=1
 
@@ -204,20 +207,31 @@ def draw(config):
     G = nx.Graph()
 
 
-
-
     for device in config.sections():
         if device != "global":
-
-            for i in range( 4 ):
-                if hosts[h].has_key( "connect" + str( i ) ):
-                    print "adding: " + "switch" + str( i ) + "->" + hosts[h]["name"]
-                    G.add_edge( hosts[h]["connect" + str( i )], hosts[h]["name"] )
+            for interface in config.options(device):
+                    if interface.startswith("eth"):
+                        to_switch = int(config.get(device, interface).split(',')[0])
+                        print "adding: " + "switch" + str(to_switch) + "->" + device
+                        G.add_edge( to_switch, device )
 
     pos = nx.spring_layout( G )
 
-    nx.draw_networkx_nodes( G, pos, nodelist=switches.keys(), node_color='red', alpha=0.6, node_size=400 )
-    nx.draw_networkx_nodes( G, pos, nodelist=hosts.keys(), node_color='green', alpha=0.6, node_size=400 )
+    hosts = config.sections()
+    sniffers = []
+    hosts.remove("global")
+    for host in hosts:
+        if config.get(host,"role") == "sniffer":
+            sniffers.append(host)
+            hosts.remove(host)
+
+    switches = range(config.getint("global","switch_count"))
+
+
+    nx.draw_networkx_nodes( G, pos, nodelist=hosts, node_color='red', alpha=0.6, node_size=400 )
+    nx.draw_networkx_nodes( G, pos, nodelist= switches, node_color='green', alpha=0.6, node_size=400 )
+    nx.draw_networkx_nodes( G, pos, nodelist= sniffers, node_color='blue', alpha=0.6, node_size=250 )
+
     nx.draw_networkx_edges( G, pos, alpha=0.5, width=3 )
     nx.draw_networkx_labels( G, pos, font_size=8 )
     plt.axis( 'off' )
@@ -245,6 +259,7 @@ def main():
     except:
         print "Error reading config file " + sys.argv[2]
         sys.exit(0)
+
 
 
     action = sys.argv[1]
