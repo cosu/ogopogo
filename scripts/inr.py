@@ -47,7 +47,7 @@ def start_host(uml_id, config, index=0):
     Returns:
     nothing
     """
-    cmd = "screen -dmS " + uml_id
+    cmd = "screen -dmS -L" + uml_id
     #normalize index
     # the index must be 2 digits
     idx = str(hex(index))[2:]
