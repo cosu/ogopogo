@@ -4,12 +4,12 @@ __author__ = 'cdumitru'
 
 import sys, ConfigParser, time, os, logging
 
-debug=False
+_debug=False
 
 def execute(cmd):
-    global debug
+    global _debug
     logging.info(cmd)
-    if not debug: os.system(cmd)
+    if not _debug: os.system(cmd)
 
 
 def stop_host( uml_id, config):
@@ -140,8 +140,8 @@ def start(config):
                 devices[role].append(device)
 
     #allow sniffers to start
-    global debug
-    if not debug: time.sleep(5)
+    global _debug
+    if not _debug: time.sleep(5)
     else: logging.info("#sleep 5")
 
     #start rest of hosts
@@ -180,8 +180,8 @@ def debug(config):
     Returns:
     nothing
     """
-    global debug
-    debug = True
+    global _debug
+    _debug = True
     start(config)
     stop(config)
 
