@@ -48,9 +48,14 @@ def start_host(uml_id, config, index=0):
     if len(idx) < 2:
         idx = "0" +idx
 
-    cmd = cmd + " linux.uml umid=" + uml_id + " rootfstype=hostfs "\
-                                              "rootflags=" + config.get(uml_id, "rootfs_path") + " ro name=" + uml_id + \
-                                            " role=" + config.get(uml_id,"role") + " index=" + idx
+    cmd += " linux.uml umid=" + uml_id + " role=" + config.get(uml_id,"role") + " index=" + idx + " name=" + uml_id
+
+
+    if config.has_option("global", "root_image"):
+        cmd += "ubd0=" + config.get("global", "root_image") + "ro"
+    else:
+        cmd +=" rootfstype=hostfs " + "rootflags=" + config.get(uml_id, "rootfs_path")
+
 
     #count interfaces
     interface_count = 0
@@ -182,8 +187,32 @@ def draw(config):
     Returns:
     nothing
     """
-    pass
 
+
+    import networkx as nx
+    import matplotlib.pyplot as plt
+
+    G = nx.Graph()
+
+
+
+
+    for device in config.sections():
+        if device != "global":
+
+            for i in range( 4 ):
+                if hosts[h].has_key( "connect" + str( i ) ):
+                    print "adding: " + "switch" + str( i ) + "->" + hosts[h]["name"]
+                    G.add_edge( hosts[h]["connect" + str( i )], hosts[h]["name"] )
+
+    pos = nx.spring_layout( G )
+
+    nx.draw_networkx_nodes( G, pos, nodelist=switches.keys(), node_color='red', alpha=0.6, node_size=400 )
+    nx.draw_networkx_nodes( G, pos, nodelist=hosts.keys(), node_color='green', alpha=0.6, node_size=400 )
+    nx.draw_networkx_edges( G, pos, alpha=0.5, width=3 )
+    nx.draw_networkx_labels( G, pos, font_size=8 )
+    plt.axis( 'off' )
+    plt.savefig( sys.argv[2] + ".png" )
 
 def main():
     logging.basicConfig(format='%(levelname)s: %(message)s', level=logging.DEBUG)
@@ -207,6 +236,7 @@ def main():
     except:
         print "Error reading config file " + sys.argv[2]
         sys.exit(0)
+
 
     action = sys.argv[1]
 
