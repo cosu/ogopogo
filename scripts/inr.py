@@ -49,7 +49,7 @@ def start_host(uml_id, config, index=0):
         idx = "0" +idx
 
     cmd = cmd + " linux.uml umid=" + uml_id + " rootfstype=hostfs "\
-                                              "rootflags=" + config.get(uml_id, "rootfs_path") + " name=" + uml_id + \
+                                              "rootflags=" + config.get(uml_id, "rootfs_path") + " r name=" + uml_id + \
                                             " role=" + config.get(uml_id,"role") + " index=" + idx
 
     #count interfaces
