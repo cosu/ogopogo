@@ -28,7 +28,7 @@ for i in `seq 0 $MAX_ETH`; do
 	#build eth0, eth1, eth2 ...
 	eval IPV4_VAL=\$$IPV4_VAR
 	eval IPV6_VAL=\$$IPV6_VAR
-	if [ ! -z $IPV4_VAL -o  ! -z $IPV6_VAL ]; then
+	if [ ! -z $IPV4_VAL -o ] || [ ! -z $IPV6_VAL ]; then
 		#configure interface
         MACIF="00:AA:AA:AA:${index}:0$i"
 		#set mac address
@@ -37,6 +37,8 @@ for i in `seq 0 $MAX_ETH`; do
         ifconfig $ETH hw ether $MACIF
 
 		if [ ! -z $IPV4_VAL ]; then
+	    	#activate ipv6 support
+            modprobe ipv6
 		    ifconfig $ETH $IPV4_VAL
 		fi
 		if [ ! -z $IPV6_VAL ]; then
@@ -121,5 +123,3 @@ if [ ! -z ${script} ]; then
 	bash /root/${script}
 fi;
 
-#activate ipv6 support
-modprobe ipv6
