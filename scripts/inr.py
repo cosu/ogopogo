@@ -47,7 +47,7 @@ def start_host(uml_id, config, index=0):
     Returns:
     nothing
     """
-    cmd = "screen -L -dmS " + uml_id
+    cmd = "screen -dmS " + uml_id
     #normalize index
     # the index must be 2 digits
     idx = str(hex(index))[2:]
@@ -81,7 +81,7 @@ def start_host(uml_id, config, index=0):
                 cmd += iface
             interface_count+=1
 
-    cmd +=  " interface_count=" + str(interface_count) + " ubd=mmap mem=" + config.get("global", "mem")
+    cmd +=  " interface_count=" + str(interface_count) + " mem=" + config.get("global", "mem")
 
 
     #pass prefix options to uml instance
