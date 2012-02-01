@@ -73,6 +73,7 @@ def start_switch(id, config):
     Returns:
     the start switch command as a string
     """
+    #switch ids start at 0!
     switch_id = "switch" + str(id)
 
     return "start-stop-daemon --start --quiet --background --pidfile "\
@@ -91,7 +92,9 @@ def start(config, debug=False):
     """
     #start switches
     for i in range(config.getint("global", "switch_count")):
-        start_switch(i, config)
+        cmd = start_switch(i, config)
+        if debug: print cmd
+        else: os.system(cmd)
 
 
     #start hosts
