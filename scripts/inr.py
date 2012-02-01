@@ -80,7 +80,8 @@ def start_host(uml_id, config, index=0):
                 cmd += iface
             interface_count+=1
 
-    cmd = cmd + " interface_count=" + str(interface_count)
+    cmd +=  " interface_count=" + str(interface_count) + " ubd=mmap mem=" + config.get("global", "mem")
+
 
     #pass prefix options to uml instance
     for option in config.options(uml_id):
