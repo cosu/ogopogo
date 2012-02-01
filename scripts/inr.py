@@ -52,7 +52,7 @@ def start_host(uml_id, config, index=0):
 
 
     if config.has_option("global", "root_image"):
-        cmd += " ubd0=" + config.get("global", "root_image") + "ro"
+        cmd += " ubd0=" + config.get("global", "root_image") + " ro "
     else:
         cmd +=" rootfstype=hostfs " + "rootflags=" + config.get(uml_id, "rootfs_path")
 
