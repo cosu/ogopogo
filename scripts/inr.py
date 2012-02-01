@@ -4,15 +4,20 @@ __author__ = 'cdumitru'
 
 import sys, ConfigParser, time, os, logging
 
+debug=True
 
-
-def execute(cmd, debug=False):
+def execute(cmd):
     logging.info(cmd)
     if not debug: os.system(cmd)
 
 
 def stop_host( uml_id, config):
-    return "uml_mconsole " + uml_id + " halt"
+    cow_path = config.get("global", "cow_path")
+    root_image = config.get("global", "root_image")
+    cow_file = cow_path +"/"+ root_image.split("/")[-1] +".cow"
+    execute(" rm -f " + cow_file)
+    execute("uml_mconsole " + uml_id + " halt")
+
 
 
 def stop_switch(switch_id, config):
@@ -23,11 +28,11 @@ def stop_switch(switch_id, config):
     config - global config object
 
     Returns:
-    the stop command as a string
+    nothing
     """
 
-    return "start-stop-daemon --stop --pidfile " + config.get("global", "switch_path") + "/switch"\
-           + str(switch_id) + ".pid "
+    execute( "start-stop-daemon --stop --pidfile " + config.get("global", "switch_path") + "/switch"\
+           + str(switch_id) + ".pid ")
 
 
 def start_host(uml_id, config, index=0):
@@ -39,7 +44,7 @@ def start_host(uml_id, config, index=0):
     index -- the index of the device in the list of devices of its type
 
     Returns:
-    the start host command as a string
+    nothing
     """
     cmd = "screen -dmS " + uml_id
     #normalize index
@@ -52,7 +57,12 @@ def start_host(uml_id, config, index=0):
 
 
     if config.has_option("global", "root_image"):
-        cmd += " ubd0=" + config.get("global", "root_image") + " ro "
+        cow_path = config.get("global", "cow_path")
+        root_image = config.get("global", "root_image")
+        cow_file = cow_path +"/"+ root_image.split("/")[-1] +".cow"
+
+        execute("uml_mkcow -f " + cow_file + " " + root_image)
+        cmd += " ubd0=" + cow_file + ","+root_image
     else:
         cmd +=" rootfstype=hostfs " + "rootflags=" + config.get(uml_id, "rootfs_path")
 
@@ -79,7 +89,7 @@ def start_host(uml_id, config, index=0):
         if option.startswith("pass_"):
             cmd += " " + option[5:] + "=" + config.get(uml_id, option)
 
-    return cmd
+    execute(cmd)
 
 
 def start_switch(id, config):
@@ -90,29 +100,27 @@ def start_switch(id, config):
     config -- global config object
 
     Returns:
-    the start switch command as a string
+    nothing
     """
     #switch ids start at 0!
     switch_id = "switch" + str(id)
 
-    return "start-stop-daemon --start --quiet --background --pidfile "\
+    cmd =  "start-stop-daemon --start --quiet --background --pidfile "\
           + config.get("global", "switch_path") + "/" + switch_id + \
           ".pid --make-pidfile --exec /usr/bin/uml_switch -- -hub -unix " + \
           config.get("global", "switch_path") + "/" + switch_id + ".ctl"
+    execute(cmd)
 
 
-
-def start(config, debug=False):
+def start(config):
     """Starts a network topology
     Arguments:
     config - global config object
-    debug - if true the script only print to stdout
 
     """
     #start switches
     for i in range(config.getint("global", "switch_count")):
-        cmd = start_switch(i, config)
-        execute(cmd, debug)
+        start_switch(i, config)
 
     #start hosts
 
@@ -125,8 +133,8 @@ def start(config, debug=False):
                 devices[role] = []
 
             if  role == "sniffer":
-                cmd = start_host(device, config)
-                execute(cmd, debug)
+                start_host(device, config)
+
 
             else:
                 devices[role].append(device)
@@ -138,18 +146,17 @@ def start(config, debug=False):
     #start rest of hosts
     for role  in devices.keys():
         for index, host in enumerate(devices[role]):
-            cmd = start_host(host, config, index)
-            execute(cmd)
+            start_host(host, config, index)
 
 
 
 
-def stop(config, debug=False):
+
+def stop(config):
     """Stops a network topology
 
     Arguments:
     config -- global config object
-    debug -- if true the script only print to stdout
 
     Returns:
     nothing
@@ -158,12 +165,11 @@ def stop(config, debug=False):
     #stop hosts
     for device in config.sections():
         if device != "global":
-            cmd = stop_host(device, config)
-            execute(cmd, debug)
+            stop_host(device, config)
             #stop switches
     for i in range(config.getint("global", "switch_count")):
-        cmd = stop_switch(i, config)
-        execute(cmd, debug)
+            stop_switch(i, config)
+
 
 def debug(config):
     """Executes start and stop in debug mode
@@ -173,8 +179,8 @@ def debug(config):
     Returns:
     nothing
     """
-    start(config, True)
-    stop(config, True)
+    start(config)
+    stop(config)
 
 
 def draw(config):

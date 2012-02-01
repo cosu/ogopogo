@@ -43,6 +43,7 @@ case ${role} in
 	router)
 	#activate ip forwarding
        echo 1 > /proc/sys/net/ipv4/ip_forward
+       echo 1 > /proc/sys/net/ipv6/conf/all/forwarding
 
         if [ ! -z ${gw} ]; then
                 #set default gateway
