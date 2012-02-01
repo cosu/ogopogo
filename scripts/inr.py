@@ -2,7 +2,14 @@
 
 __author__ = 'cdumitru'
 
-import sys, ConfigParser, time, os
+import sys, ConfigParser, time, os, logging
+
+
+
+def execute(cmd, debug=False):
+    logging.info(cmd)
+    if not debug: os.system(cmd)
+
 
 def stop_host( uml_id, config):
     return "uml_mconsole " + uml_id + " halt"
@@ -93,9 +100,7 @@ def start(config, debug=False):
     #start switches
     for i in range(config.getint("global", "switch_count")):
         cmd = start_switch(i, config)
-        if debug: print cmd
-        else: os.system(cmd)
-
+        execute(cmd, debug)
 
     #start hosts
 
@@ -109,21 +114,22 @@ def start(config, debug=False):
 
             if  role == "sniffer":
                 cmd = start_host(device, config)
-                if debug: print cmd
-                else: os.system(cmd)
+                execute(cmd, debug)
+
             else:
                 devices[role].append(device)
 
     #allow sniffers to start
     if not debug: time.sleep(5)
-    else: print "#sleep 5"
+    else: logging.info("#sleep 5")
 
     #start rest of hosts
     for role  in devices.keys():
         for index, host in enumerate(devices[role]):
             cmd = start_host(host, config, index)
-            if debug: print cmd
-            else: os.system(cmd)
+            execute(cmd)
+
+
 
 
 def stop(config, debug=False):
@@ -141,14 +147,11 @@ def stop(config, debug=False):
     for device in config.sections():
         if device != "global":
             cmd = stop_host(device, config)
-            if debug: print cmd
-            else: os.system(cmd)
+            execute(cmd, debug)
             #stop switches
     for i in range(config.getint("global", "switch_count")):
         cmd = stop_switch(i, config)
-        if debug: print cmd
-        else: os.system(cmd)
-
+        execute(cmd, debug)
 
 def debug(config):
     """Executes start and stop in debug mode
@@ -176,6 +179,8 @@ def draw(config):
 
 
 def main():
+    logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.DEBUG)
+
     if  len(sys.argv) != 3:
         print "ERROR: Invalid arguments. Usage : " + sys.argv[0] +\
               "<start|stop|status|map> <config file>"
@@ -186,6 +191,7 @@ def main():
         print "ERROR: Invalid arguments. Usage : " + sys.argv[0] +\
               "<start|stop|status|map> <config file>"
         sys.exit(0)
+
 
     try:
         config = ConfigParser.ConfigParser()

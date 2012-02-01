@@ -45,8 +45,7 @@ case ${role} in
 
 		#if quaggadir mount it over hostfs
         if [ ! -z ${quaggadir} ]; then
-                quaggadir=/root/uml/configs/${quaggadir}
-                mount -t hostfs none /etc/quagga -o $quaggadir
+                mount -t hostfs none /etc/quagga -o ${quaggadir}
                 chown -R quagga:quagga /etc/quagga
         fi
 
@@ -77,7 +76,7 @@ case ${role} in
 								
                                MACBR="00:BB:BB:BB:BB:$hostid$j"
                                ifconfig $BRIDGE up hw ether $MACBR
-
+                               echo "INFO: added bridge $BRIDGE with MAC: $MACBR"
                         fi
                 done
                 echo "INFO: bridges are up"
