@@ -23,7 +23,7 @@ for i in `seq 0 3`; do
 	ETH="eth$i"
 	#build eth0, eth1, eth2 ...
 	eval IP_VAL=\$$CONF_VAR
-	if [ ! -z $ETH_VAL ]; then
+	if [ ! -z $IP_VAL ]; then
 		#configure interface
 		echo "INFO: configuring interface $ETH with IP:$IP_VAL"
 		ifconfig $ETH $IP_VAL up

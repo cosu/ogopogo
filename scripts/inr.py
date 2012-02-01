@@ -179,7 +179,7 @@ def draw(config):
 
 
 def main():
-    logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.DEBUG)
+    logging.basicConfig(format='%(levelname)s: %(message)s', level=logging.DEBUG)
 
     if  len(sys.argv) != 3:
         print "ERROR: Invalid arguments. Usage : " + sys.argv[0] +\
