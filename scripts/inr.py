@@ -69,6 +69,7 @@ def start_host(uml_id, config, index=0):
     #count interfaces
 
 
+    interface_count = 0
     for interface in config.options(uml_id):
 
         if interface.startswith("eth"):
@@ -94,9 +95,10 @@ def start_host(uml_id, config, index=0):
             if ipv6 !="":
                 iface = " ip6" + interface_idx + "=" + ipv6 + " "
                 cmd += iface
+            interface_count +=1
 
 
-    cmd += " mem=" + config.get("global", "mem")
+    cmd += " mem=" + config.get("global", "mem") + " interface_count=" + str(interface_count)
 
 
     #pass prefix options to uml instance
