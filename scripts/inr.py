@@ -70,13 +70,24 @@ def start_host(uml_id, config, index=0):
     interface_count = 0
 
     for interface in config.options(uml_id):
+
         if interface.startswith("eth"):
-            (to_switch, ipv4,ipv6) = config.get(uml_id, interface).split(',')
+            network_info = config.get(uml_id, interface).split(',')
+            ipv4 = ""
+            ipv6 = ""
+            to_switch =""
+
+            if len(network_info) == 3:
+                (to_switch, ipv4,ipv6) = network_info
+            elif len(network_info) ==2 :
+                (to_switch, ipv4) = network_info
+            else:
+                to_switch = network_info
             eth = " " + interface + "=daemon,,unix,"
             sw = config.get("global", "switch_path") + "/switch" + to_switch + ".ctl"
             cmd = cmd + eth + sw
 
-            if ipv4:
+            if ipv4!="":
                 iface = " ip" + str(interface_count) + "=" + ipv4 + " "
                 cmd += iface
             if ipv6 !="":
