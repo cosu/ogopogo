@@ -79,7 +79,7 @@ def start_host(uml_id, config, index=0):
             if ipv4:
                 iface = " ip" + str(interface_count) + "=" + ipv4 + " "
                 cmd += iface
-            if ipv6:
+            if ipv6 !="":
                 iface = " ip6" + str(interface_count) + "=" + ipv6 + " "
                 cmd += iface
             interface_count+=1
