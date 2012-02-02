@@ -100,6 +100,8 @@ def start_host(uml_id, config, index=0):
 
     cmd += " mem=" + config.get("global", "mem") + " interface_count=" + str(interface_count)
 
+    if config.has_option(uml_id, "home"):
+        cmd += " home=" + config.get(uml_id, "home")
 
     #pass prefix options to uml instance
     for option in config.options(uml_id):
