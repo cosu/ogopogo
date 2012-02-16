@@ -42,6 +42,7 @@ Features
 
 Devices
 The script can create three types of network devices:
+
 - switches - UML switches to which the other devices connect. All switches are started in -hub mode.
 - hosts - UML instances connected to the switches. Useful to test pings, services, etc.
 - sniffers - they dump via tcpump to $UML_HOME all captured traffic. You can connect to multiple network segments as each segment is dumped to a separate file.
