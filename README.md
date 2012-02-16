@@ -40,16 +40,16 @@ Now to connect to host1
 Features
 --------
 
-Devices
+###Creating Devices
 The script can create three types of network devices:
 
-- switches - UML switches to which the other devices connect. All switches are started in -hub mode.
-- hosts - UML instances connected to the switches. Useful to test pings, services, etc.
-- sniffers - they dump via tcpump to $UML_HOME all captured traffic. You can connect to multiple network segments as each segment is dumped to a separate file.
-- bridges - using bridge-tools this device bridges two or more ethernet interfaces. One instance supports more than one bridge
-- routers - routers load quagga config files via hostfs and start the quagga routing suite
+- switches: UML switches to which the other devices connect. All switches are started in -hub mode.
+- hosts: UML instances connected to the switches. Useful to test pings, services, etc.
+- sniffers: they dump via tcpump to $UML_HOME all captured traffic. You can connect to multiple network segments as each segment is dumped to a separate file.
+- bridges: using bridge-tools this device bridges two or more ethernet interfaces. One instance supports more than one bridge
+- routers: routers load quagga config files via hostfs and start the quagga routing suite
 
-Drawing
+###Drawing
 As a debug feature one can draw the network topologies resulted from the config files. This is done via the map argument
 : python inr.py map simple.cfg. It's automated so the layout could be better but it still gives a good overview of the network
 
