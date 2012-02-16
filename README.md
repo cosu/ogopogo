@@ -47,7 +47,7 @@ The script can create three types of network devices:
 - hosts: UML instances connected to the switches. Useful to test pings, services, etc.
 - sniffers: they dump via tcpump to $UML_HOME all captured traffic. You can connect to multiple network segments as each segment is dumped to a separate file.
 - bridges: using bridge-tools this device bridges two or more ethernet interfaces. One instance supports more than one bridge
-- routers: routers load quagga config files via hostfs and start the quagga routing suite
+- routers:  routers load quagga config files via hostfs and start the quagga routing suite
 
 ###Drawing
 As a debug feature one can draw the network topologies resulted from the config files. This is done via the map argument
