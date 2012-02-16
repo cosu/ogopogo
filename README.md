@@ -31,6 +31,8 @@ Once the network is started you can attach to the console of each device using t
         24036.host6	(02/16/12 10:43:58)	(Detached)
         23664.sniffer1	(02/16/12 10:43:53)	(Detached)
 
+Now to connect to host1
+
     root@uml-host:~# screen -r host1
 
 
@@ -42,7 +44,7 @@ Devices
 The script can create three types of network devices:
 - switches - UML switches to which the other devices connect. All switches are started in -hub mode.
 - hosts - UML instances connected to the switches. Useful to test pings, services, etc.
-- sniffers - they dump via tcpump to $UML_HOME all captured traffic
+- sniffers - they dump via tcpump to $UML_HOME all captured traffic. You can connect to multiple network segments as each segment is dumped to a separate file.
 - bridges - using bridge-tools this device bridges two or more ethernet interfaces. One instance supports more than one bridge
 - routers - routers load quagga config files via hostfs and start the quagga routing suite
 
