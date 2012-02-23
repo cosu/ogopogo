@@ -160,8 +160,8 @@ def start(config):
 
     #allow sniffers to start
     global _debug
-    if not _debug: time.sleep(5)
-    else: logging.info("#sleep 5")
+    if not _debug: time.sleep(15)
+    logging.info("#sleeping 15 seconds to allow sniffers to start first")
 
     #start rest of hosts
     for role  in devices.keys():
