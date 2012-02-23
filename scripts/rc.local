@@ -1,7 +1,11 @@
 #!/bin/sh
 
 #maximum number of network interfaces
-MAX_ETH=9 
+MAX_ETH=9
+A=6
+B=8
+X="A"
+Y="B"
 
 
 hostname ${name}
@@ -30,7 +34,7 @@ for i in `seq 0 $MAX_ETH`; do
 	eval IPV6_VAL=\$$IPV6_VAR
 	if [ ! -z $IPV4_VAL ] || [ ! -z $IPV6_VAL ]; then
 		#configure interface
-        MACIF="00:AA:AA:AA:${index}:0$i"
+        MACIF="00:AA:AA:${index}:0$X:0$Y"
 		#set mac address
 		ifconfig $ETH down
 		echo "INFO: configuring interface $ETH with IP:$IPV4_VAL $IPV6_VAL MAC: $MACIF"
@@ -95,7 +99,7 @@ case ${role} in
 									echo "INFO: added $ETH to bridge $BRIDGE"
                                 done
 							   
-                               MACBR="00:BB:BB:BB:${index}:${index}"
+                               MACBR="00:BB:BB:BB:${index}:$A$B"
                                ifconfig $BRIDGE up hw ether $MACBR
                                echo "INFO: added bridge $BRIDGE with MAC: $MACBR"
                         fi
