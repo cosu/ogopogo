@@ -98,7 +98,14 @@ def start_host(uml_id, config, index=0):
             interface_count +=1
 
 
-    cmd += " mem=" + config.get("global", "mem") + " interface_count=" + str(interface_count)
+    #custom mem setting per host
+    mem = config.get("global", "mem")
+    if config.has_option(uml_id, "mem") :
+        mem = config.get(uml_id, "mem")
+
+
+
+    cmd += " mem=" + mem + " interface_count=" + str(interface_count)
 
     if config.has_option(uml_id, "home"):
         cmd += " home=" + config.get(uml_id, "home")
