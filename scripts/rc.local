@@ -34,7 +34,7 @@ for i in `seq 0 $MAX_ETH`; do
 	eval IPV6_VAL=\$$IPV6_VAR
 	if [ ! -z $IPV4_VAL ] || [ ! -z $IPV6_VAL ]; then
 		#configure interface
-        MACIF="00:AA:AA:${index}:0$X:0$Y"
+        MACIF="00:AA:AA:${index}:$i$X:$i$Y"
 		#set mac address
 		ifconfig $ETH down
 		echo "INFO: configuring interface $ETH with IP:$IPV4_VAL $IPV6_VAL MAC: $MACIF"
@@ -93,8 +93,11 @@ case ${role} in
                                 brctl stp "$BRIDGE" on
                                 echo "INFO: bridge $BRIDGE is up"
                                 for ETH in $BRVAL; do
+                                    i=`echo $ETH| sed -r 's/eth([0-9])/\1/'
 									ifconfig  $ETH down
 									brctl addif $BRIDGE $ETH
+									MACIF="00:AA:AA:${index}:$i$X:$i$Y"
+									ifconfig $ETH hw ether $MACIF
 									ifconfig $ETH up
 									echo "INFO: added $ETH to bridge $BRIDGE"
                                 done
