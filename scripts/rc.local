@@ -102,7 +102,7 @@ case ${role} in
 									echo "INFO: added $ETH to bridge $BRIDGE"
                                 done
 							   
-                               MACBR="00:BB:BB:BB:${index}:$A$B"
+                               MACBR="00:BB:BB:BB:$i$i:$A$B"
                                ifconfig $BRIDGE up hw ether $MACBR
                                echo "INFO: added bridge $BRIDGE with MAC: $MACBR"
                         fi
