@@ -94,8 +94,6 @@ case ${role} in
                                 echo "INFO: bridge $BRIDGE is up"
                                 for ETH in $BRVAL; do
                                     i=`echo $ETH| sed -r 's/eth([0-9])/\1/'`
-                                                                                                                                                        u7i0 pp0-=[
-                                                                                                                                                        \'=;
 									ifconfig  $ETH down
 									brctl addif $BRIDGE $ETH
 									MACIF="00:AA:AA:${index}:$i$X:$i$Y"
