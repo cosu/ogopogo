@@ -85,8 +85,16 @@ def start_host(uml_id, config, index=0):
                 (to_switch, ipv4) = network_info
             else:
                 to_switch = network_info
-            eth = " " + interface + "=daemon,,unix,"
-            sw = config.get("global", "switch_path") + "/switch" + to_switch + ".ctl"
+
+            #check for tuntap
+            print to_switch
+            if to_switch.startswith("tap"):
+                eth = " " + interface +"=tuntap,"
+                sw = to_switch + ",,"
+            else:
+                eth = " " + interface + "=daemon,,unix,"
+                sw = config.get("global", "switch_path") + "/switch" + to_switch + ".ctl"
+
             cmd = cmd + eth + sw
 
             if ipv4!="":
@@ -151,6 +159,7 @@ def start(config):
     #start hosts
 
     devices = {}
+    sniffer = False
     for device in config.sections():
         if device != "global":
             role = config.get(device, "role")
@@ -159,15 +168,16 @@ def start(config):
                 devices[role] = []
 
             if  role == "sniffer":
+                sniffer = True
                 start_host(device, config)
-
 
             else:
                 devices[role].append(device)
 
     #allow sniffers to start
-    global _debug
-    if not _debug: time.sleep(15)
+    if sniffer:
+        global _debug
+        if not _debug: time.sleep(15)
     logging.info("#sleeping 15 seconds to allow sniffers to start first")
 
     #start rest of hosts
