@@ -87,7 +87,6 @@ def start_host(uml_id, config, index=0):
                 to_switch = network_info
 
             #check for tuntap
-            print to_switch
             if to_switch.startswith("tap"):
                 eth = " " + interface +"=tuntap,"
                 sw = to_switch + ",,"
