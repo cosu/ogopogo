@@ -19,7 +19,7 @@
 # group "quaggavty" and set to ug=rw,o= though. Check /etc/pam.d/quagga, too.
 #
 zebra=yes
-bgpd=yes
+bgpd=no
 ospfd=yes
 ospf6d=no
 ripd=no
