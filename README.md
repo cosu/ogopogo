@@ -1,8 +1,7 @@
-SNE INR 2012 Public repo
+Ogopogo - A simple environment  for running network experiments 
 =========================
 
-
-Tools to setup an experimental network environment
+Ogopogo allows one to quickly build virtual network topologies.  
 
 Requirements
 ------------
