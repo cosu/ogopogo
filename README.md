@@ -11,9 +11,9 @@ Python, user-mode-linux, screen
 Getting started
 ---------------
 - write a cfg file using .ini/properties format (see /examples)
-- start network ./inr.py start config.cfg  - starts the topoligy
-- stop network ./inr.py stop config.cfg  - stops the topology
-- map network ./inr.py map config.cfg  - this creats a png file of the network topology - useful for debugging setups
+- start network ./ogo.py start config.cfg  - starts the topoligy
+- stop network ./ogo.py stop config.cfg  - stops the topology
+- map network ./ogo.py map config.cfg  - this creats a png file of the network topology - useful for debugging setups
 
 Once the network is started you can attach to the console of each device using the screen utility:
 
@@ -50,6 +50,6 @@ The script can create three types of network devices:
 
 ###Drawing
 As a debug feature one can draw the network topologies resulted from the config files. This is done via the map argument
-: python inr.py map simple.cfg. It's automated so the layout could be better but it still gives a good overview of the network
+: ./ogo.py map simple.cfg. It's automated so the layout could be better but it still gives a good overview of the network
 
 
