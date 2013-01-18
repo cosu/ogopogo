@@ -19,7 +19,7 @@ MIRROR="http://ftp.nl.debian.org/debian"
 dd if=/dev/zero of=$IMG_NAME bs=1M count=1 seek=$SIZE
 mkfs.ext3 -F $IMG_NAME
 mount -o loop $IMG_NAME $TMPDIR
-debootstrap --variant=minbase --include="$PACKAGES mingetty iproute net-tools iputils-ping"  stable $TMPDIR $MIRROR
+debootstrap --variant=minbase --include="$PACKAGES mingetty iproute net-tools iputils-ping traceroute"  stable $TMPDIR $MIRROR
 
 echo "hostfs /lib/modules hostfs /usr/lib/uml/modules 0 0" >> $TMPDIR/etc/fstab
 echo "proc /proc proc defaults 0 0
