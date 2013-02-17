@@ -19,7 +19,7 @@ def execute(cmd):
 
 
 def stop_host(uml_id, config):
-    cow_path = config.get("global", "cow_path")
+    cow_path = config.get("global", "session_path")
     root_image = config.get("global", "root_image")
     root_file = root_image.split("/")[-1]
     remove_cow_cmd = "rm -f {cow_path}/{root_file}-{uml_id}.cow".format(**locals())
@@ -41,7 +41,7 @@ def stop_switch(switch_id, config):
     nothing
     """
 
-    switch_path = config.get("global", "switch_path")
+    switch_path = config.get("global", "session_path")
 
     cmd = "start-stop-daemon --stop --pidfile {switch_path}/switch-{switch_id}.pid".format(**locals())
 
@@ -67,7 +67,7 @@ def start_host(uml_id, config, index=0):
         idx = "0" + idx
 
     role = config.get(uml_id, "role")
-    cow_path = config.get("global", "cow_path")
+    cow_path = config.get("global", "session_path")
     root_image = config.get("global", "root_image")
     root_image_name = root_image.split("/")[-1]
 
@@ -104,7 +104,7 @@ def start_host(uml_id, config, index=0):
                 sw = "{to_switch},,".format(**locals())
             else:
                 eth = "{interface}=daemon,,unix,".format(**locals())
-                switch_path = config.get("global", "switch_path")
+                switch_path = config.get("global", "session_path")
                 sw = "{switch_path}/switch-{to_switch}.ctl".format(**locals())
 
             cmd.append(eth)
@@ -154,7 +154,7 @@ def start_switch(id, config):
     """
     #switch ids start at 0!
     switch_id = "switch-{0}".format(id)
-    switch_path = config.get("global", "switch_path")
+    switch_path = config.get("global", "session_path")
 
     cmd = "start-stop-daemon --start --quiet --background --pidfile {switch_path}/{switch_id}.pid " \
           "--make-pidfile --exec /usr/bin/uml_switch -- -hub -unix {switch_path}/{switch_id}.ctl".format(**locals())
