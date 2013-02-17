@@ -78,4 +78,3 @@ echo "iface lo inet loopback" >> $TMPDIR/etc/network/interfaces
 
 umount $TMPDIR
 
-chown ${SUDO_USER}: $IMG_NAME
