@@ -3,8 +3,8 @@ Ogopogo - quickly build virtual network topologies.
 
 Requirements
 ------------
-Python, user-mode-linux, screen
-Optionally python-networkx and python-matplotlib
+* Python, user-mode-linux, screen
+* Optionally python-networkx and python-matplotlib
 
 Getting started
 ---------------
