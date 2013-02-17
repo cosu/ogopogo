@@ -1,8 +1,8 @@
 #!/bin/bash
 
 #list of extra packages to be installed
-PACKAGES="tcpdump quagga bridge-utils radvd vim"
-BASE_PACKAGES="iproute net-tools iputils-ping traceroute module-init-tools"
+PACKAGES="tcpdump quagga bridge-utils radvd bird"
+BASE_PACKAGES="iproute net-tools iputils-ping traceroute mingetty module-init-tools procps vim"
 #image size. note that the image is created as a sparse file
 SIZE=2048
 
@@ -15,6 +15,12 @@ IMG_NAME=disk.img
 TMPDIR=/mnt
 #to speedup installation use a nearby mirror
 MIRROR="http://ftp.nl.debian.org/debian"
+
+
+if [ `whoami` != root ]; then
+    echo Please run this script as root or using sudo
+    exit
+fi
 
 dd if=/dev/zero of=$IMG_NAME bs=1M count=1 seek=$SIZE
 mkfs.ext3 -F $IMG_NAME
@@ -31,13 +37,14 @@ tmpfs                  /var/run          tmpfs     defaults          0      0
 tmpfs                  /var/tmp          tmpfs     defaults         0      0
 " >> $TMPDIR/etc/fstab
 
-for service in quagga radvd cron; do
-  chroot $TMPDIR /bin/bash -c "update-rc.d -f $service remove" > /dev/null
+for service in quagga radvd cron bird; do
+  chroot $TMPDIR /bin/bash -c "update-rc.d -f $service remove" 2>/dev/null
 done
 
 chroot $TMPDIR /bin/bash -c "mkdir /lib/modules"
 mv $TMPDIR/etc/rcS.d/S04hwclockfirst.sh $TMPDIR/etc/rcS.d/K04hwclockfirst
 mv $TMPDIR/etc/rcS.d/S06hwclock.sh $TMPDIR/etc/rcS.d/K06hwclock.sh
+mv $TMPDIR/etc/rcS.d/S06module-init-tools $TMPDIR/etc/rcS.d/K08module-init-tools
 cp rc.local $TMPDIR/etc/
 chmod +x $TMPDIR/etc/rc.local
 
@@ -51,4 +58,3 @@ echo "auto lo" >> $TMPDIR/etc/network/interfaces
 echo "iface lo inet loopback" >> $TMPDIR/etc/network/interfaces
 
 umount $TMPDIR
-

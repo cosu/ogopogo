@@ -21,6 +21,23 @@ fi;
 
 
 
+#Z is a variable that is used to generate the mac address. Each type of network device is starts with a different sequence.
+case ${role} in
+        router)
+        Z="A"
+        ;;
+        bridge)
+        Z="B"
+    	;;
+    	sniffer)
+    	Z="C"
+        ;;
+        host)
+        Z="0"
+        ;;
+    esac
+
+
 # set up networking...
 
 #TODO dynamic interface count
@@ -34,7 +51,7 @@ for i in `seq 0 $MAX_ETH`; do
 	eval IPV6_VAL=\$$IPV6_VAR
 	if [ ! -z $IPV4_VAL ] || [ ! -z $IPV6_VAL ]; then
 		#configure interface
-        MACIF="00:AA:AA:${index}:$i$X:$i$Y"
+        MACIF="00:$Z$Z:00:${index}:$i$X:$i$Y"
 		#set mac address
 		ifconfig $ETH down
 		echo "INFO: configuring interface $ETH with IP:$IPV4_VAL $IPV6_VAL MAC: $MACIF"
