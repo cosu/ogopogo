@@ -26,7 +26,7 @@ Y88b. .d88PY88b 888Y88..88P888 d88PY88..88PY88b 888Y88..88P
             "Y88P"         888              "Y88P"
 EOF
 `
-echo $banner
+echo $banner > /etc/motd
 
 hostname ${name}
 
