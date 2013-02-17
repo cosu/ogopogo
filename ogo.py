@@ -13,7 +13,7 @@ _debug = False
 
 def execute(cmd):
     global _debug
-    logging.info(cmd)
+    logging.debug(cmd)
     if not _debug:
         os.system(cmd)
 
@@ -24,6 +24,7 @@ def stop_host(uml_id, config):
     root_file = root_image.split("/")[-1]
     remove_cow_cmd = "rm -f {cow_path}/{root_file}-{uml_id}.cow".format(**locals())
     halt_uml_cmd = "uml_mconsole {uml_id} halt".format(**locals())
+
 
     execute(remove_cow_cmd)
     execute(halt_uml_cmd)
@@ -175,14 +176,16 @@ def start(config):
     devices = {}
     sniffer = False
     for device in config.sections():
-        if device != "global":
-            role = config.get(device, "role")
 
+        if device != "global":
+
+            role = config.get(device, "role")
             if not role in devices.keys():
                 devices[role] = []
 
             if role == "sniffer":
                 sniffer = True
+                logging.info("Starting sniffer {0}".format(device))
                 start_host(device, config)
 
             else:
@@ -192,13 +195,17 @@ def start(config):
     if sniffer:
         global _debug
         if not _debug:
-            logging.info("#sleeping 5 seconds to allow sniffers to start first")
+            logging.info("sleeping 5 seconds to allow sniffers to start first")
             time.sleep(5)
 
     #start rest of hosts
     for role in devices.keys():
         for index, host in enumerate(devices[role]):
+            logging.info("Starting host {0}".format(host))
+
             start_host(host, config, index)
+
+    execute("screen -ls")
 
 
 def stop(config):
@@ -214,9 +221,11 @@ def stop(config):
     #stop hosts
     for device in config.sections():
         if device != "global":
+            logging.info("Stopping device {0}".format(device))
             stop_host(device, config)
             #stop switches
     for i in range(config.getint("global", "broadcast_domains")):
+        logging.info("Stopping switch {0}".format(i))
         stop_switch(i, config)
 
 
