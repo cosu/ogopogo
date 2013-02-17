@@ -1,7 +1,11 @@
 #!/bin/sh
 
+#author: Cosmin Dumitru <c.dumitru@uva.nl>
+
 #maximum number of network interfaces
 MAX_ETH=9
+
+#magic values
 A=6
 B=8
 X="A"
