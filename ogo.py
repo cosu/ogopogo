@@ -2,23 +2,31 @@
 
 __author__ = 'cdumitru'
 
-import sys, ConfigParser, time, os, logging
+import sys
+import ConfigParser
+import time
+import os
+import logging
 
-_debug=False
+_debug = False
+
 
 def execute(cmd):
     global _debug
     logging.info(cmd)
-    if not _debug: os.system(cmd)
+    if not _debug:
+        os.system(cmd)
 
 
-def stop_host( uml_id, config):
+def stop_host(uml_id, config):
     cow_path = config.get("global", "cow_path")
     root_image = config.get("global", "root_image")
-    cow_file = cow_path +"/"+ root_image.split("/")[-1] +"-"+uml_id+".cow"
-    execute("rm -f " + cow_file)
-    execute("uml_mconsole " + uml_id + " halt")
+    root_file = root_image.split("/")[-1]
+    remove_cow_cmd = "rm -f {cow_path}/{root_file}-{uml_id}.cow".format(**locals())
+    halt_uml_cmd = "uml_mconsole {uml_id} halt".format(**locals())
 
+    execute(remove_cow_cmd)
+    execute(halt_uml_cmd)
 
 
 def stop_switch(switch_id, config):
@@ -32,8 +40,11 @@ def stop_switch(switch_id, config):
     nothing
     """
 
-    execute( "start-stop-daemon --stop --pidfile " + config.get("global", "switch_path") + "/switch"\
-           + str(switch_id) + ".pid ")
+    switch_path = config.get("global", "switch_path")
+
+    cmd = "start-stop-daemon --stop --pidfile {switch_path}/switch-{switch_id}.pid".format(**locals())
+
+    execute(cmd)
 
 
 def start_host(uml_id, config, index=0):
@@ -52,23 +63,21 @@ def start_host(uml_id, config, index=0):
     # the index must be 2 digits
     idx = str(hex(index))[2:]
     if len(idx) < 2:
-        idx = "0" +idx
+        idx = "0" + idx
 
-    cmd += " linux.uml umid=" + uml_id + " role=" + config.get(uml_id,"role") + " index=" + idx + " name=" + uml_id
-
-
+    role = config.get(uml_id, "role")
     cow_path = config.get("global", "cow_path")
     root_image = config.get("global", "root_image")
-    cow_file = cow_path +"/"+ root_image.split("/")[-1] +"-"+uml_id+".cow"
+    root_image_name = root_image.split("/")[-1]
+
+    cow_file = "{cow_path}/{root_image_name}-{uml_id}.cow".format(**locals())
+
+    cmd = "screen -dmS {uml_id} linux.uml umid={uml_id} role={role} index={idx} name={uml_id} " \
+          "ubd0={cow_file},{root_image}".format(**locals())
 
     execute("uml_mkcow -f " + cow_file + " " + root_image)
 
-    cmd += " ubd0=" + cow_file + ","+root_image
-
-
     #count interfaces
-
-
     interface_count = 0
     for interface in config.options(uml_id):
 
@@ -77,18 +86,18 @@ def start_host(uml_id, config, index=0):
             network_info = config.get(uml_id, interface).split(',')
             ipv4 = ""
             ipv6 = ""
-            to_switch =""
+            to_switch = ""
 
             if len(network_info) == 3:
-                (to_switch, ipv4,ipv6) = network_info
-            elif len(network_info) ==2 :
+                (to_switch, ipv4, ipv6) = network_info
+            elif len(network_info) == 2:
                 (to_switch, ipv4) = network_info
             else:
                 to_switch = network_info
 
             #check for tuntap
             if to_switch.startswith("tap"):
-                eth = " " + interface +"=tuntap,"
+                eth = " " + interface + "=tuntap,"
                 sw = to_switch + ",,"
             else:
                 eth = " " + interface + "=daemon,,unix,"
@@ -96,21 +105,18 @@ def start_host(uml_id, config, index=0):
 
             cmd = cmd + eth + sw
 
-            if ipv4!="":
+            if ipv4 != "":
                 iface = " ip" + interface_idx + "=" + ipv4 + " "
                 cmd += iface
-            if ipv6 !="":
+            if ipv6 != "":
                 iface = " ip6" + interface_idx + "=" + ipv6 + " "
                 cmd += iface
-            interface_count +=1
-
+            interface_count += 1
 
     #custom mem setting per host
     mem = config.get("global", "mem")
-    if config.has_option(uml_id, "mem") :
+    if config.has_option(uml_id, "mem"):
         mem = config.get(uml_id, "mem")
-
-
 
     cmd += " mem=" + mem + " interface_count=" + str(interface_count)
 
@@ -136,12 +142,11 @@ def start_switch(id, config):
     nothing
     """
     #switch ids start at 0!
-    switch_id = "switch" + str(id)
+    switch_id = "switch-{0}".format(id)
+    switch_path = config.get("global", "switch_path")
 
-    cmd =  "start-stop-daemon --start --quiet --background --pidfile "\
-          + config.get("global", "switch_path") + "/" + switch_id + \
-          ".pid --make-pidfile --exec /usr/bin/uml_switch -- -hub -unix " + \
-          config.get("global", "switch_path") + "/" + switch_id + ".ctl"
+    cmd = "start-stop-daemon --start --quiet --background --pidfile {switch_path}/{switch_id}.pid " \
+          "--make-pidfile --exec /usr/bin/uml_switch -- -hub -unix {switch_path}/{switch_id}.ctl".format(**locals())
     execute(cmd)
 
 
@@ -152,7 +157,7 @@ def start(config):
 
     """
     #start switches
-    for i in range(config.getint("global", "switch_count")):
+    for i in range(config.getint("global", "broadcast_domains")):
         start_switch(i, config)
 
     #start hosts
@@ -163,10 +168,10 @@ def start(config):
         if device != "global":
             role = config.get(device, "role")
 
-            if  not devices.has_key(role):
+            if not role in devices.keys():
                 devices[role] = []
 
-            if  role == "sniffer":
+            if role == "sniffer":
                 sniffer = True
                 start_host(device, config)
 
@@ -176,16 +181,14 @@ def start(config):
     #allow sniffers to start
     if sniffer:
         global _debug
-        if not _debug: time.sleep(15)
-    logging.info("#sleeping 15 seconds to allow sniffers to start first")
+        if not _debug:
+            time.sleep(5)
+    logging.info("#sleeping 5 seconds to allow sniffers to start first")
 
     #start rest of hosts
-    for role  in devices.keys():
+    for role in devices.keys():
         for index, host in enumerate(devices[role]):
             start_host(host, config, index)
-
-
-
 
 
 def stop(config):
@@ -203,8 +206,8 @@ def stop(config):
         if device != "global":
             stop_host(device, config)
             #stop switches
-    for i in range(config.getint("global", "switch_count")):
-            stop_switch(i, config)
+    for i in range(config.getint("global", "broadcast_domains")):
+        stop_switch(i, config)
 
 
 def debug(config):
@@ -232,57 +235,54 @@ def draw(config):
     nothing
     """
 
-
     import networkx as nx
     import matplotlib.pyplot as plt
 
     G = nx.Graph()
 
-
     for device in config.sections():
         if device != "global":
             for interface in config.options(device):
-                    if interface.startswith("eth"):
-                        to_switch = int(config.get(device, interface).split(',')[0])
-                        print "adding: " + "switch" + str(to_switch) + "->" + device
-                        G.add_edge( to_switch, device )
+                if interface.startswith("eth"):
+                    to_switch = int(config.get(device, interface).split(',')[0])
+                    print "adding: " + "switch" + str(to_switch) + "->" + device
+                    G.add_edge(to_switch, device)
 
-    pos = nx.spring_layout( G )
+    pos = nx.spring_layout(G)
 
     hosts = config.sections()
     sniffers = []
     hosts.remove("global")
     for host in hosts:
-        if config.get(host,"role") == "sniffer":
+        if config.get(host, "role") == "sniffer":
             sniffers.append(host)
             hosts.remove(host)
 
-    switches = range(config.getint("global","switch_count"))
+    switches = range(config.getint("global", "broadcast_domains"))
 
+    nx.draw_networkx_nodes(G, pos, nodelist=hosts, node_color='red', alpha=0.6, node_size=400)
+    nx.draw_networkx_nodes(G, pos, nodelist=switches, node_color='green', alpha=0.6, node_size=400)
+    nx.draw_networkx_nodes(G, pos, nodelist=sniffers, node_color='blue', alpha=0.6, node_size=250)
 
-    nx.draw_networkx_nodes( G, pos, nodelist=hosts, node_color='red', alpha=0.6, node_size=400 )
-    nx.draw_networkx_nodes( G, pos, nodelist= switches, node_color='green', alpha=0.6, node_size=400 )
-    nx.draw_networkx_nodes( G, pos, nodelist= sniffers, node_color='blue', alpha=0.6, node_size=250 )
+    nx.draw_networkx_edges(G, pos, alpha=0.5, width=3)
+    nx.draw_networkx_labels(G, pos, font_size=8)
+    plt.axis('off')
+    plt.savefig(sys.argv[2] + ".png")
 
-    nx.draw_networkx_edges( G, pos, alpha=0.5, width=3 )
-    nx.draw_networkx_labels( G, pos, font_size=8 )
-    plt.axis( 'off' )
-    plt.savefig( sys.argv[2] + ".png" )
 
 def main():
     logging.basicConfig(format='%(levelname)s: %(message)s', level=logging.DEBUG)
 
-    if  len(sys.argv) != 3:
-        print "ERROR: Invalid arguments. Usage : " + sys.argv[0] +\
-              "<start|stop|status|map> <config file>"
+    if len(sys.argv) != 3:
+        print "ERROR: Invalid arguments. Usage : " + sys.argv[0] + \
+              "<start|stop|map> <config file>"
         sys.exit(0)
 
-    if (( sys.argv[1] != "start" ) and ( sys.argv[1] != "stop" ) and ( sys.argv[1] != "map" ) and (
-        sys.argv[1] != "status" ) and (sys.argv[1] != "debug")):
-        print "ERROR: Invalid arguments. Usage : " + sys.argv[0] +\
+    if ((sys.argv[1] != "start") and (sys.argv[1] != "stop") and (sys.argv[1] != "map") and (
+            sys.argv[1] != "status") and (sys.argv[1] != "debug")):
+        print "ERROR: Invalid arguments. Usage : " + sys.argv[0] + \
               "<start|stop|status|map> <config file>"
         sys.exit(0)
-
 
     try:
         config = ConfigParser.ConfigParser()
@@ -291,8 +291,6 @@ def main():
     except:
         print "Error reading config file " + sys.argv[2]
         sys.exit(0)
-
-
 
     action = sys.argv[1]
 
@@ -308,6 +306,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
-
-

@@ -1,4 +1,4 @@
-Ogopogo - quickly build virtual network topologies.
+Ogopogo - quickly build virtual network topologies
 =========================
 
 Requirements
@@ -37,13 +37,17 @@ Features
 --------
 
 ###Creating Devices
-The script can create three types of network devices:
+Ogo can create three types of network devices:
 
 - switches: UML switches to which the other devices connect. All switches are started in -hub mode so network sniffers can be attached.
 - hosts: UML instances connected to the switches. Useful to test pings, services, etc.
 - sniffers: they dump via tcpump to $UML_HOME all captured traffic. You can connect to multiple network segments as each segment is dumped to a separate file.
 - bridges: using bridge-tools this device bridges two or more ethernet interfaces. One instance supports multiple bridges
 - routers:  routers load quagga config files via hostfs and start the quagga routing suite. See the examples dir for more detail
+
+###Slim root file system
+The buildroot_fs.sh script creates a slimmed down Debian stable image suitable for user mode linux. Services can be easily
+added by adding them to the list of new packages. All the services are removed from startup and are started via rc.local.
 
 ###Drawing
 As a debug feature one can draw the network topologies resulted from the config files. This is done via the map argument.

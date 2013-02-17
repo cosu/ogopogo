@@ -56,8 +56,6 @@ for service in $SERVICES; do
 done
 
 #remove some services to speedup startup
-mv $TMPDIR/etc/rcS.d/S04hwclockfirst.sh $TMPDIR/etc/rcS.d/K04hwclockfirst
-mv $TMPDIR/etc/rcS.d/S06hwclock.sh $TMPDIR/etc/rcS.d/K06hwclock.sh
 mv $TMPDIR/etc/rcS.d/S06module-init-tools $TMPDIR/etc/rcS.d/K08module-init-tools
 
 #copy our own version of rc.local to enable roles
