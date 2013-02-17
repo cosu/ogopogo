@@ -58,7 +58,7 @@ def start_host(uml_id, config, index=0):
     Returns:
     nothing
     """
-    cmd = "screen -dmS " + uml_id
+    cmd = []
     #normalize index
     # the index must be 2 digits
     idx = str(hex(index))[2:]
@@ -72,10 +72,12 @@ def start_host(uml_id, config, index=0):
 
     cow_file = "{cow_path}/{root_image_name}-{uml_id}.cow".format(**locals())
 
-    cmd = "screen -dmS {uml_id} linux.uml umid={uml_id} role={role} index={idx} name={uml_id} " \
-          "ubd0={cow_file},{root_image}".format(**locals())
+    screen_cmd = "screen -dmS {uml_id} linux.uml umid={uml_id} role={role} index={idx} name={uml_id} " \
+                 "ubd0={cow_file},{root_image}".format(**locals())
+    cmd .append(screen_cmd)
 
-    execute("uml_mkcow -f " + cow_file + " " + root_image)
+    mk_cow_cmd = "uml_mkcow -f {cow_file} {root_image}".format(**locals())
+    execute(mk_cow_cmd)
 
     #count interfaces
     interface_count = 0
@@ -84,8 +86,8 @@ def start_host(uml_id, config, index=0):
         if interface.startswith("eth"):
             interface_idx = interface.lstrip("eth")
             network_info = config.get(uml_id, interface).split(',')
-            ipv4 = ""
-            ipv6 = ""
+            ipv4 = False
+            ipv6 = False
             to_switch = ""
 
             if len(network_info) == 3:
@@ -97,20 +99,23 @@ def start_host(uml_id, config, index=0):
 
             #check for tuntap
             if to_switch.startswith("tap"):
-                eth = " " + interface + "=tuntap,"
-                sw = to_switch + ",,"
+                eth = "{interface}=tuntap,".format(**locals())
+                sw = "{to_switch},,".format(**locals())
             else:
-                eth = " " + interface + "=daemon,,unix,"
-                sw = config.get("global", "switch_path") + "/switch" + to_switch + ".ctl"
+                eth = "{interface}=daemon,,unix,".format(**locals())
+                switch_path = config.get("global", "switch_path")
+                sw = "{switch_path}/switch-{to_switch}.ctl".format(**locals())
 
-            cmd = cmd + eth + sw
+            cmd.append(eth)
+            cmd.append(sw)
 
-            if ipv4 != "":
-                iface = " ip" + interface_idx + "=" + ipv4 + " "
-                cmd += iface
-            if ipv6 != "":
-                iface = " ip6" + interface_idx + "=" + ipv6 + " "
-                cmd += iface
+            if ipv4:
+                iface = "ip{interface_idx}={ipv4}".format(**locals())
+                cmd.append(iface)
+            if ipv6:
+                iface = "ip6{interface_idx}={ipv6}".format(**locals())
+                cmd.append(iface)
+
             interface_count += 1
 
     #custom mem setting per host
@@ -118,15 +123,20 @@ def start_host(uml_id, config, index=0):
     if config.has_option(uml_id, "mem"):
         mem = config.get(uml_id, "mem")
 
-    cmd += " mem=" + mem + " interface_count=" + str(interface_count)
+    mem = "mem={mem} interface_count={interface_count}".format(**locals())
+    cmd.append(mem)
 
     if config.has_option(uml_id, "home"):
-        cmd += " home=" + config.get(uml_id, "home")
+        home = "home=" + config.get(uml_id, "home")
+        cmd.append(home)
 
     #pass prefix options to uml instance
     for option in config.options(uml_id):
         if option.startswith("pass_"):
-            cmd += " " + option[5:] + "=" + config.get(uml_id, option)
+            passopt = option[5:] + "=" + config.get(uml_id, option)
+            cmd.append(passopt)
+
+    cmd = " ".join(cmd)
 
     execute(cmd)
 
@@ -182,8 +192,8 @@ def start(config):
     if sniffer:
         global _debug
         if not _debug:
+            logging.info("#sleeping 5 seconds to allow sniffers to start first")
             time.sleep(5)
-    logging.info("#sleeping 5 seconds to allow sniffers to start first")
 
     #start rest of hosts
     for role in devices.keys():
