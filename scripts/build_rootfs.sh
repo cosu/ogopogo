@@ -77,4 +77,3 @@ echo "iface lo inet loopback" >> $TMPDIR/etc/network/interfaces
 
 
 umount $TMPDIR
-

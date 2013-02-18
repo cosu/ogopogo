@@ -13,28 +13,22 @@ Getting started
 - stop network ./ogo.py stop config.cfg  - stops the topology
 - map network ./ogo.py map config.cfg  - this creates a png file of the network topology - useful for debugging setups
 
-Once the network is started you can attach to the console of each device using the screen utility:
+Once the network is started you can attach to the console of each device using the 'screen -r <hostname>' command.
 
-    root@uml-host:~# screen -ls
-    There are screens on:
-        24026.host7	(02/16/12 10:43:58)	(Detached)
-        24127.host8	(02/16/12 10:43:58)	(Detached)
-        24102.host1	(02/16/12 10:43:58)	(Detached)
-        24049.host5	(02/16/12 10:43:58)	(Detached)
-        24113.host9	(02/16/12 10:43:58)	(Detached)
-        24075.host3	(02/16/12 10:43:58)	(Detached)
-        24089.host2	(02/16/12 10:43:58)	(Detached)
-        24063.host4	(02/16/12 10:43:58)	(Detached)
-        24036.host6	(02/16/12 10:43:58)	(Detached)
-        23664.sniffer1	(02/16/12 10:43:53)	(Detached)
-
-Connect to host1
-
-    root@uml-host:~# screen -r host1
 
 
 Features
 --------
+
+Ogo uses UML and uml_switch to create network topologies. Each host is connected to one more more broadcast domains.
+A broadcast domain is represented by a uml_switch process. Broadcast domains are numbered starting with 0.
+
+    #  host1 --- (sw0)  ---  host2
+
+In the topology above there is one broadcast domain and two hosts connected to it.
+
+
+
 
 ###Creating Devices
 Ogo can create three types of network devices:
@@ -48,11 +42,13 @@ Ogo can create three types of network devices:
 ###Slim root file system
 The buildroot_fs.sh script creates a slimmed down Debian stable image suitable for user mode linux. Services can be easily
 added by adding them to the list of new packages. All the services are removed from startup and are started via rc.local.
+Make sure that the owner of the root filesystem disk is the user under which ogo is running. For now, the script creates
+a file which is owned by root so you have to manually set permissions.
 
 ###Drawing
 As a debug feature one can draw the network topologies resulted from the config files. This is done via the map argument.
 
-    ./ogo.py map simple.cfg
+    ./ogo.py map examples/simple.cfg
 
 It's automated so the layout could be better but it still gives a good overview of the network
 
