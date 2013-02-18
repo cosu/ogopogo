@@ -107,8 +107,7 @@ def start_host(uml_id, config, index=0):
                 switch_path = config.get("global", "session_path")
                 sw = "{switch_path}/switch-{to_switch}.ctl".format(**locals())
 
-            cmd.append(eth)
-            cmd.append(sw)
+            cmd.append(eth + sw)
 
             if ipv4:
                 iface = "ip{interface_idx}={ipv4}".format(**locals())

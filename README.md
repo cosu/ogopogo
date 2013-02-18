@@ -53,3 +53,4 @@ As a debug feature one can draw the network topologies resulted from the config 
 It's automated so the layout could be better but it still gives a good overview of the network
 
 
+This has been tested under Ubuntu 12.04 and Debian 6.0.6.
