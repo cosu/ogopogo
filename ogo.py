@@ -201,7 +201,7 @@ def start(config):
     for role in devices.keys():
         for index, host in enumerate(devices[role]):
             logging.info("Starting host {0}".format(host))
-
+            time.sleep(0.5)
             start_host(host, config, index)
 
     execute("screen -ls")
