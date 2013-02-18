@@ -59,7 +59,7 @@ done
 mv $TMPDIR/etc/rcS.d/S06module-init-tools $TMPDIR/etc/rcS.d/K08module-init-tools
 
 #copy our own version of rc.local to enable roles
-cp rc.local $TMPDIR/etc/
+cp ./rc.local $TMPDIR/etc/
 chmod +x $TMPDIR/etc/rc.local
 
 #backup inittab
