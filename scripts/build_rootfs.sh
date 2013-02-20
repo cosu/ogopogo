@@ -57,6 +57,8 @@ done
 
 #remove some services to speedup startup
 mv $TMPDIR/etc/rcS.d/S06module-init-tools $TMPDIR/etc/rcS.d/K08module-init-tools
+mv $TMPDIR/etc/rcS.d/S06checkfs.sh $TMPDIR/etc/rcS.d/K06checkfs.sh
+
 
 #copy our own version of rc.local to enable roles
 cp ./rc.local $TMPDIR/etc/
