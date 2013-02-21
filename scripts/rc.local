@@ -65,10 +65,11 @@ for ETH in $INTERFACES; do
     echo "INFO: configuring interface $ETH with MAC: $MACIF"
     ifconfig $ETH down
     ifconfig $ETH hw ether $MACIF
+    eval IPV4_VAL=\$$IPV4_VAR
+    eval IPV6_VAL=\$$IPV6_VAR
 
 	if [ ! -z $IPV4_VAL ] || [ ! -z $IPV6_VAL ]; then
-        eval IPV4_VAL=\$$IPV4_VAR
-        eval IPV6_VAL=\$$IPV6_VAR
+
         echo "INFO: configuring interface $ETH with IP:$IPV4_VAL $IPV6_VAL"
 		if [ ! -z $IPV4_VAL ]; then
 	    	#activate ipv6 support
