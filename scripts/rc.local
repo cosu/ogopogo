@@ -5,7 +5,7 @@
 #maximum number of network interfaces
 MAX_ETH=9
 
-#magic values
+#magic values pseudo-unique per student
 A=6
 B=8
 X="A"
@@ -32,7 +32,7 @@ fi;
 
 
 
-#Z is a  magic variable that is used to generate the mac address.
+#Z is a  magic value that is used to generate the mac address.
 #Each type of network device starts with a different sequence.
 case ${role} in
         router)
@@ -61,7 +61,7 @@ for ETH in $INTERFACES; do
 	IPV6_VAR="ip6$i"
     #configure interface
     #set mac address
-    MACIF="00:$Z$Z:00:${index}:$i$X:$i$Y"
+    MACIF="00:$Z$Z:00:${index}:$X$Y:$i$i"
     echo "INFO: configuring interface $ETH with MAC: $MACIF"
     ifconfig $ETH down
     ifconfig $ETH hw ether $MACIF
