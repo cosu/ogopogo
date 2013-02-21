@@ -59,8 +59,6 @@ for ETH in $INTERFACES; do
     i=`echo $ETH| sed -r 's/eth([0-9])/\1/'`
 	IPV4_VAR="ip$i"
 	IPV6_VAR="ip6$i"
-	ETH="eth$i"
-	#build eth0, eth1, eth2 ...
     #configure interface
     #set mac address
     MACIF="00:$Z$Z:00:${index}:$i$X:$i$Y"
@@ -83,7 +81,6 @@ for ETH in $INTERFACES; do
 		fi
 		#bring the interface up only if it has an ip configured
     	ifconfig $ETH up
-
 	fi
 
 done
