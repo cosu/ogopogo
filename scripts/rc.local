@@ -52,9 +52,9 @@ esac
 
 # set up networking...
 
-interfaces = `ifconfig -a | grep 'Link' | awk '{print $1}'|grep -v 'lo'`
+INTERFACES=`ifconfig -a | grep 'Link' | awk '{print $1}'|grep -v 'lo'`
 
-for i in $interfaces; do
+for i in $INTERFACES; do
 	#get current interface and associated env info
     i=`echo $ETH| sed -r 's/eth([0-9])/\1/'`
 	IPV4_VAR="ip$i"
