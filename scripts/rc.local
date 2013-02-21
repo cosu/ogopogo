@@ -32,7 +32,8 @@ fi;
 
 
 
-#Z is a variable that is used to generate the mac address. Each type of network device is starts with a different sequence.
+#Z is a  magic variable that is used to generate the mac address.
+#Each type of network device starts with a different sequence.
 case ${role} in
         router)
         Z="A"
@@ -46,7 +47,7 @@ case ${role} in
         host)
         Z="0"
         ;;
-    esac
+esac
 
 
 # set up networking...
@@ -58,16 +59,17 @@ for i in `seq 0 $MAX_ETH`; do
 	IPV6_VAR="ip6$i"
 	ETH="eth$i"
 	#build eth0, eth1, eth2 ...
-	eval IPV4_VAL=\$$IPV4_VAR
-	eval IPV6_VAL=\$$IPV6_VAR
-	if [ ! -z $IPV4_VAL ] || [ ! -z $IPV6_VAL ]; then
-		#configure interface
-        MACIF="00:$Z$Z:00:${index}:$i$X:$i$Y"
-		#set mac address
-		ifconfig $ETH down
-		echo "INFO: configuring interface $ETH with IP:$IPV4_VAL $IPV6_VAL MAC: $MACIF"
-        ifconfig $ETH hw ether $MACIF
+    #configure interface
+    #set mac address
+    MACIF="00:$Z$Z:00:${index}:$i$X:$i$Y"
+    echo "INFO: configuring interface $ETH with MAC: $MACIF"
+    ifconfig $ETH down
+    ifconfig $ETH hw ether $MACIF
 
+	if [ ! -z $IPV4_VAL ] || [ ! -z $IPV6_VAL ]; then
+        eval IPV4_VAL=\$$IPV4_VAR
+        eval IPV6_VAL=\$$IPV6_VAR
+        echo "INFO: configuring interface $ETH with IP:$IPV4_VAL $IPV6_VAL"
 		if [ ! -z $IPV4_VAL ]; then
 	    	#activate ipv6 support
 
@@ -77,11 +79,8 @@ for i in `seq 0 $MAX_ETH`; do
 		    modprobe ipv6
 		    ifconfig $ETH inet6 add $IPV6_VAL
 		fi
-
-		ifconfig $ETH up
 	fi
-
-
+	ifconfig $ETH up
 
 done
 
