@@ -117,21 +117,17 @@ case ${role} in
                         eval BRVAL=\$$BRIDGE
 						#configure bridge
                         if [ ! -z "$BRVAL" ]; then
-                                brctl addbr "$BRIDGE"
-                                brctl stp "$BRIDGE" on
-                                echo "INFO: bridge $BRIDGE is up"
+                                brctl addbr $BRIDGE
+                                brctl stp $BRIDGE on
+                                echo "INFO: bridge $BRIDGE created"
                                 for ETH in $BRVAL; do
                                     i=`echo $ETH| sed -r 's/eth([0-9])/\1/'`
-									ifconfig  $ETH down
-									MACIF="00:AA:AA:${index}:$i$X:$i$Y"
-									echo "INFO: $ETH MAC set to $MACIF"
-									ifconfig $ETH hw ether $MACIF
 									brctl addif $BRIDGE $ETH
 									echo "INFO: added $ETH to bridge $BRIDGE"
 									ifconfig $ETH up
                                 done
 							   
-                               MACBR="00:BB:BB:${index}:$i$i:$A$B"
+                               MACBR="00:$Z$Z:$Z$Z:${index}:$A$B:$i$i"
                                ifconfig $BRIDGE up hw ether $MACBR
                                echo "INFO: added bridge $BRIDGE with MAC: $MACBR"
                         fi
