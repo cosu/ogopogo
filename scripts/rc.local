@@ -52,9 +52,11 @@ esac
 
 # set up networking...
 
-#TODO dynamic interface count
-for i in `seq 0 $MAX_ETH`; do
+interfaces = `ifconfig -a | grep 'Link' | awk '{print $1}'|grep -v 'lo'`
+
+for i in $interfaces; do
 	#get current interface and associated env info
+    i=`echo $ETH| sed -r 's/eth([0-9])/\1/'`
 	IPV4_VAR="ip$i"
 	IPV6_VAR="ip6$i"
 	ETH="eth$i"
@@ -79,8 +81,10 @@ for i in `seq 0 $MAX_ETH`; do
 		    modprobe ipv6
 		    ifconfig $ETH inet6 add $IPV6_VAL
 		fi
+		#bring the interface up only if it has an ip configured
+    	ifconfig $ETH up
+
 	fi
-	ifconfig $ETH up
 
 done
 
@@ -122,11 +126,12 @@ case ${role} in
                                 for ETH in $BRVAL; do
                                     i=`echo $ETH| sed -r 's/eth([0-9])/\1/'`
 									ifconfig  $ETH down
-									brctl addif $BRIDGE $ETH
 									MACIF="00:AA:AA:${index}:$i$X:$i$Y"
+									echo "INFO: $ETH MAC set to $MACIF"
 									ifconfig $ETH hw ether $MACIF
-									ifconfig $ETH up
+									brctl addif $BRIDGE $ETH
 									echo "INFO: added $ETH to bridge $BRIDGE"
+									ifconfig $ETH up
                                 done
 							   
                                MACBR="00:BB:BB:${index}:$i$i:$A$B"
