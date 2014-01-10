@@ -50,6 +50,9 @@ tmpfs                  /var/run          tmpfs     defaults          0      0
 tmpfs                  /var/tmp          tmpfs     defaults         0      0
 " >> $TMPDIR/etc/fstab
 
+# Make sure that /lib/modules exists
+mkdir $TMPDIR/lib/modules
+
 #disable services at startup. we'll start them in a role based fashion later
 for service in $SERVICES; do
   chroot $TMPDIR /bin/bash -c "update-rc.d -f $service remove" 2>/dev/null
@@ -57,8 +60,8 @@ done
 
 #remove some services to speedup startup
 # mv $TMPDIR/etc/rcS.d/S06module-init-tools $TMPDIR/etc/rcS.d/K08module-init-tools
+mv $TMPDIR/etc/rcS.d/S03hwclock.sh $TMPDIR/etc/rcS.d/K03hwclock.sh
 mv $TMPDIR/etc/rcS.d/S06checkfs.sh $TMPDIR/etc/rcS.d/K06checkfs.sh
-
 
 #copy our own version of rc.local to enable roles
 cp ./rc.local $TMPDIR/etc/
