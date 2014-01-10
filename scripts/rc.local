@@ -13,7 +13,7 @@ Y="B"
 
 
 banner=`cat << EOF
-INR ogogpogo 2013
+INR ogogpogo 2014
 `
 echo $banner > /etc/motd
 
