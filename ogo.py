@@ -43,7 +43,7 @@ def stop_switch(switch_id, config):
 
     switch_path = config.get("global", "session_path")
 
-    cmd = "start-stop-daemon --stop --pidfile {switch_path}/switch-{switch_id}.pid".format(**locals())
+    cmd = "/sbin/start-stop-daemon --stop --pidfile {switch_path}/switch-{switch_id}.pid".format(**locals())
 
     execute(cmd)
 
@@ -142,7 +142,7 @@ def start_host(uml_id, config, index=0):
 
 
 def start_switch(id, config):
-    """Builds a string to start an uml switch via start-stop-daemon
+    """Builds a string to start an uml switch via /sbin/start-stop-daemon
 
     Arguments:
     id -- the id of the switch
@@ -155,7 +155,7 @@ def start_switch(id, config):
     switch_id = "switch-{0}".format(id)
     switch_path = config.get("global", "session_path")
 
-    cmd = "start-stop-daemon --start --quiet --background --pidfile {switch_path}/{switch_id}.pid " \
+    cmd = "/sbin/start-stop-daemon --start --quiet --background --pidfile {switch_path}/{switch_id}.pid " \
           "--make-pidfile --exec /usr/bin/uml_switch -- -hub -unix {switch_path}/{switch_id}.ctl".format(**locals())
     execute(cmd)
 
@@ -262,9 +262,12 @@ def draw(config):
         if device != "global":
             for interface in config.options(device):
                 if interface.startswith("eth"):
-                    to_switch = int(config.get(device, interface).split(',')[0])
-                    print "adding: " + "switch" + str(to_switch) + "->" + device
-                    G.add_edge(to_switch, device)
+                    to_switch = config.get(device, interface).split(',')[0]
+                    # Test if this is a number, then we add it.
+                    if not to_switch[0].isalpha():
+                        to_switch = int()
+                        print "adding: " + "switch" + str(to_switch) + "->" + device
+                        G.add_edge(to_switch, device)
 
     pos = nx.spring_layout(G)
 
