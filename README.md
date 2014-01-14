@@ -55,3 +55,9 @@ It's automated so the layout could be better but it still gives a good overview 
 
 
 This has been tested under Ubuntu 12.04 and Debian 6.0.6.
+
+
+###Contributors
+- Cosmin Dumitru  - cosu
+- Jeroen van Der Ham  - jeroenh
+- Gabor Toth - tg-x : idea to replace uml_switch with vde
