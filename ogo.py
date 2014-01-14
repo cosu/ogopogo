@@ -132,8 +132,10 @@ def start_host(uml_id, config, index=0):
             passopt = option[5:] + "=" + config.get(uml_id, option)
             cmd.append(passopt)
 
+    # Disable swap initialization on the instance
+    cmd.append("noswap")
+    
     cmd = " ".join(cmd)
-
     execute(cmd)
 
 
