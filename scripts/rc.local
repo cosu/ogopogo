@@ -17,7 +17,11 @@ INR ogogpogo 2014
 `
 echo $banner > /etc/motd
 
-hostname ${name}
+if [ -z ${name} ]; then
+    hostname "uml-instance";
+else
+    hostname ${name};
+fi
 
 
 #bring local host up
