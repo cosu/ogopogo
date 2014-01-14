@@ -30,7 +30,7 @@ def stop_host(uml_id, config):
 
 
 def stop_switch(switch_id, config):
-    """ Builds a string to stop a VDE switch process
+    """ Builds a string to stop an VDE switch process
 
     Arguments:
     switch_id -- the id of the switch to be stopped
@@ -72,9 +72,6 @@ def start_host(uml_id, config, index=0):
     screen_cmd = "screen -dmS {uml_id} linux.uml umid={uml_id} role={role} index={idx} name={uml_id} " \
                  "ubd0={cow_file},{root_image}".format(**locals())
     cmd .append(screen_cmd)
-
-    mk_cow_cmd = "uml_mkcow -f {cow_file} {root_image}".format(**locals())
-    execute(mk_cow_cmd)
 
     #count interfaces
     interface_count = 0
