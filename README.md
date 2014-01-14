@@ -24,7 +24,7 @@ A collision domain is implemented by a vde_switch process in hub mode. Hubs are 
 
     #  host1 --- (hub0)  ---  host2
 
-In the topology above there is one broadcast domain and two hosts connected to it.
+In the topology above there is one collision domain and two hosts connected to it.
 
 
 
