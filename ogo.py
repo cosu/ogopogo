@@ -30,7 +30,7 @@ def stop_host(uml_id, config):
 
 
 def stop_switch(switch_id, config):
-    """ Builds a string to stop an UML switch process
+    """ Builds a string to stop a VDE switch process
 
     Arguments:
     switch_id -- the id of the switch to be stopped
