@@ -162,7 +162,7 @@ def start(config):
 
     """
     #start switches
-    for i in range(config.getint("global", "broadcast_domains")):
+    for i in range(config.getint("global", "hubs")):
         start_switch(i, config)
 
     #start hosts
@@ -218,7 +218,7 @@ def stop(config):
             logging.info("Stopping device {0}".format(device))
             stop_host(device, config)
             #stop switches
-    for i in range(config.getint("global", "broadcast_domains")):
+    for i in range(config.getint("global", "hubs")):
         logging.info("Stopping switch {0}".format(i))
         stop_switch(i, config)
 
@@ -274,7 +274,7 @@ def draw(config):
             sniffers.append(host)
             hosts.remove(host)
 
-    switches = range(config.getint("global", "broadcast_domains"))
+    switches = range(config.getint("global", "hubs"))
 
     nx.draw_networkx_nodes(G, pos, nodelist=hosts, node_color='red', alpha=0.6, node_size=400)
     nx.draw_networkx_nodes(G, pos, nodelist=switches, node_color='green', alpha=0.6, node_size=400)

@@ -19,10 +19,10 @@ Once the network is started you can attach to the console of each device using t
 Features
 --------
 
-Ogo uses UML and vde_switch to create network topologies. Each host is connected to one more more broadcast domains.
-A broadcast domain is represented by a uml_switch process. Broadcast domains are numbered starting with 0.
+Ogo uses UML and vde_switch to create network topologies. Each host is connected to one more more collision domains.
+A collision domain is implemented by a vde_switch process in hub mode. Hubs are numbered starting with 0.
 
-    #  host1 --- (sw0)  ---  host2
+    #  host1 --- (hub0)  ---  host2
 
 In the topology above there is one broadcast domain and two hosts connected to it.
 
