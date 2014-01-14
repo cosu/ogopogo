@@ -24,8 +24,7 @@ def stop_host(uml_id, config):
     root_file = root_image.split("/")[-1]
     remove_cow_cmd = "rm -f {cow_path}/{root_file}-{uml_id}.cow".format(**locals())
     halt_uml_cmd = "uml_mconsole {uml_id} halt".format(**locals())
-
-
+    
     execute(remove_cow_cmd)
     execute(halt_uml_cmd)
 
@@ -40,11 +39,8 @@ def stop_switch(switch_id, config):
     Returns:
     nothing
     """
-
     switch_path = config.get("global", "session_path")
-
-    cmd = "/sbin/start-stop-daemon --stop --pidfile {switch_path}/switch-{switch_id}.pid".format(**locals())
-
+    cmd = "vdecmd -s {switch_path}/switch-{switch_id}.mgmt shutdown".format(**locals())
     execute(cmd)
 
 
@@ -105,7 +101,7 @@ def start_host(uml_id, config, index=0):
             else:
                 eth = "{interface}=daemon,,unix,".format(**locals())
                 switch_path = config.get("global", "session_path")
-                sw = "{switch_path}/switch-{to_switch}.ctl".format(**locals())
+                sw = "{switch_path}/switch-{to_switch}.ctl/ctl".format(**locals())
 
             cmd.append(eth + sw)
 
@@ -142,7 +138,7 @@ def start_host(uml_id, config, index=0):
 
 
 def start_switch(id, config):
-    """Builds a string to start an uml switch via /sbin/start-stop-daemon
+    """Builds a string to start a vde switch
 
     Arguments:
     id -- the id of the switch
@@ -154,9 +150,9 @@ def start_switch(id, config):
     #switch ids start at 0!
     switch_id = "switch-{0}".format(id)
     switch_path = config.get("global", "session_path")
-
-    cmd = "/sbin/start-stop-daemon --start --quiet --background --pidfile {switch_path}/{switch_id}.pid " \
-          "--make-pidfile --exec /usr/bin/uml_switch -- -hub -unix {switch_path}/{switch_id}.ctl".format(**locals())
+    
+    cmd = "vde_switch --daemon --hub --mgmt {switch_path}/{switch_id}.mgmt"\
+            " --sock {switch_path}/{switch_id}.ctl".format(**locals())
     execute(cmd)
 
 
