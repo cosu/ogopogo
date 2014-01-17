@@ -149,7 +149,7 @@ case ${role} in
 			    ETH="eth$i"
 
 			    ip link set $ETH up
-			    tcpdump -i $ETH -U -s 0 -w /root/${name}-$ETH-`date +%H%M`.dmp ${tcpdump}&
+			    tcpdump -i $ETH -U -s 0 -w /root/${name}-$ETH-`date +%m%d-%H%M`.pcap ${tcpdump}&
 			fi
 		done
 
