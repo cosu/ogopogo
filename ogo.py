@@ -303,7 +303,7 @@ def test(config):
                 # Test if path exists and it is an absolute path
                 # (os.path.exists returns true for relative existing paths)
                 if not os.path.exists(quaggadir) or not quaggadir.startswith("/"):
-                    sys.stderr("ERROR: Configured quaggadir for %s does not exist.\n" % (device))
+                    sys.stderr.write("ERROR: Configured quaggadir for %s does not exist.\n" % (device))
                     broken = True
     if broken:
         sys.exit(1)
