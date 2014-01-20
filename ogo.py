@@ -300,9 +300,9 @@ def test(config):
             # Check whether quaggadir exists
             if option == ("pass_quaggadir"):
                 quaggadir = config.get(device, option)
-                # Test if path exists and it is an absolute path
+                # Test if path exists and it is an absolute path (surrounded by "")
                 # (os.path.exists returns true for relative existing paths)
-                if not os.path.exists(quaggadir) or not quaggadir.startswith("/"):
+                if not os.path.exists(quaggadir[1:-1]) or not quaggadir.startswith('"/'):
                     sys.stderr.write("ERROR: Configured quaggadir for %s does not exist.\n" % (device))
                     broken = True
     if broken:
