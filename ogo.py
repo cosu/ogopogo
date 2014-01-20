@@ -285,6 +285,29 @@ def draw(config):
     plt.axis('off')
     plt.savefig(sys.argv[2] + ".png")
 
+def test(config):
+    broken = False
+    img = config.get("global", "root_image")
+    if not os.path.isfile(img):
+        sys.stderr.write("ERROR: Configured root_image file does not exist.\n")
+        broken = True
+    elif os.stat(img).st_uid != os.getuid():
+        sys.stderr.write("ERROR: Configured root_iamge file is not owned by current user.\n")
+        broken = True
+    # Check devices
+    for device in config.sections():
+        for option in config.options(device):
+            # Check whether quaggadir exists
+            if option == ("pass_quaggadir"):
+                quaggadir = config.get(device, option)
+                # Test if path exists and it is an absolute path
+                # (os.path.exists returns true for relative existing paths)
+                if not os.path.exists(quaggadir) or not quaggadir.startswith("/"):
+                    sys.stderr("ERROR: Configured quaggadir for %s does not exist.\n" % (device))
+                    broken = True
+    if broken:
+        sys.exit(1)
+
 
 def main():
     logging.basicConfig(format='%(levelname)s: %(message)s', level=logging.DEBUG)
@@ -311,12 +334,14 @@ def main():
     action = sys.argv[1]
 
     if action == "start":
+        test(config)
         start(config)
     elif action == "stop":
         stop(config)
     elif action == "map":
         draw(config)
     elif action == "debug":
+        test(config)
         debug(config)
 
 
