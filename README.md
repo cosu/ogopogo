@@ -32,7 +32,7 @@ In the topology above there is one collision domain and two hosts connected to i
 ###Creating Devices
 Ogo can create three types of network devices:
 
-- switches: VDE switches to which the other devices connect. All VDE switches are started in -hub mode so network sniffers can be attached.
+- hubs: VDE switches to which the other devices connect. All VDE switches are started in -hub mode so network sniffers can be attached.
 - hosts: UML instances connected to the vde switches. Useful to test pings, services, etc.
 - sniffers: they dump via tcpump to $UML_HOME all captured traffic. You can connect to multiple network segments as each segment is dumped to a separate file.
 - bridges: using bridge-tools this device bridges two or more ethernet interfaces on the host instances. One instance can support multiple bridges.
