@@ -40,7 +40,7 @@ def stop_switch(switch_id, config):
     nothing
     """
     switch_path = config.get("global", "session_path")
-    cmd = "unixcmd -s {switch_path}/switch-{switch_id}.mgmt shutdown".format(**locals())
+    cmd = "vdecmd -s {switch_path}/switch-{switch_id}.mgmt shutdown".format(**locals())
     execute(cmd)
 
 
