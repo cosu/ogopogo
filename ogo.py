@@ -40,7 +40,7 @@ def stop_switch(switch_id, config):
     nothing
     """
     switch_path = config.get("global", "session_path")
-    cmd = "vdecmd -s {switch_path}/switch-{switch_id}.mgmt shutdown".format(**locals())
+    cmd = "unixcmd -s {switch_path}/switch-{switch_id}.mgmt shutdown".format(**locals())
     execute(cmd)
 
 
@@ -257,12 +257,12 @@ def draw(config):
         if device != "global":
             for interface in config.options(device):
                 if interface.startswith("eth"):
-                    to_switch = config.get(device, interface).split(',')[0]
+                    to_hub = config.get(device, interface).split(',')[0]
                     # Test if this is a number, then we add it.
-                    if not to_switch[0].isalpha():
-                        to_switch = int()
-                        print "adding: " + "switch" + str(to_switch) + "->" + device
-                        G.add_edge(to_switch, device)
+                    if not to_hub[0].isalpha():
+                        to_hub = int(to_hub[0])
+                        print "adding: " + "switch" + str(to_hub) + "->" + device
+                        G.add_edge(to_hub, device)
 
     pos = nx.spring_layout(G)
 
