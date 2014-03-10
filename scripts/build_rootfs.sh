@@ -12,7 +12,7 @@ SIZE=2048
 #image name
 IMG_NAME=disk.img
 #list of extra packages to be installed
-SERVICES="quagga radvd bird"
+SERVICES="quagga radvd bird bird6"
 PACKAGES="tcpdump bridge-utils"
 BASE_PACKAGES="iproute net-tools iputils-ping traceroute mingetty module-init-tools procps vim"
 #to speedup installation use a nearby mirror
