@@ -75,6 +75,9 @@ def start_host(uml_id, config, index=0):
 
     #count interfaces
     interface_count = 0
+    # Arno, 2014-05-16: Keep UML random MAC for tap devices. Note
+    # this code assumes there is just one tap interface per UML instance
+    tapdev = "tapdev0="
     for interface in config.options(uml_id):
 
         if interface.startswith("eth"):
@@ -95,6 +98,7 @@ def start_host(uml_id, config, index=0):
             if to_switch.startswith("tap"):
                 eth = "{interface}=tuntap,".format(**locals())
                 sw = "{to_switch},,".format(**locals())
+                tapdev += interface 
             else:
                 eth = "{interface}=daemon,,unix,".format(**locals())
                 switch_path = config.get("global", "session_path")
@@ -131,6 +135,9 @@ def start_host(uml_id, config, index=0):
 
     # Disable swap initialization on the instance
     cmd.append("noswap")
+
+    # Arno
+    cmd.append(tapdev)
     
     cmd = " ".join(cmd)
     execute(cmd)

@@ -68,11 +68,14 @@ for ETH in $INTERFACES; do
 	IPV4_VAR="ip$i"
 	IPV6_VAR="ip6$i"
     #configure interface
-    #set mac address
-    MACIF="00:$Z${Z2}:00:${index}:$X$Y:$i$i"
-    echo "INFO: configuring interface $ETH with MAC: $MACIF"
-    ifconfig $ETH down
-    ifconfig $ETH hw ether $MACIF
+    #Arno: keep random MAC if it is a tap device
+    if [ "$tapdev0" != "$ETH" ]; then
+        #set mac address
+        MACIF="00:$Z${Z2}:00:${index}:$X$Y:$i$i"
+        echo "INFO: configuring interface $ETH with MAC: $MACIF"
+        ifconfig $ETH down
+        ifconfig $ETH hw ether $MACIF
+    fi
     eval IPV4_VAL=\$$IPV4_VAR
     eval IPV6_VAL=\$$IPV6_VAR
 
